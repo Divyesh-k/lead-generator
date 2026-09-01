@@ -1,0 +1,86 @@
+const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
+
+const cookie = 'r=g; flusrcty=Surat; hd_ctval=ctval%3DAll%20India; site-entry-page=https://www.indiamart.com/seller/?rditm=eyJyZWFzb24iOiJHZW5lcmljIC8gSW52YWxpZCBDb21wYW55IE5hbWUifQ==&device=soi_desktop; v4iilex=; pop_mthd=FL%3D0%7CDTy%3D1; LGNSTR=0%2C2%2C0%2C1%2C1%2C1%2C1%2C0%2C1; im_iss=t%3DeyJhbGciOiJzaGEyNTYiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiI5KjcqNSozKjIqIiwiY2R0IjoiMDgtMDgtMjAyNiIsImV4cCI6MTc4NjI3ODU2MywiaWF0IjoxNzg2MTkyMTYzLCJpc3MiOiJVU0VSIiwic3ViIjoiMjAyNjI4NjQifQ.fHfBaDTM3jvK9ocrx54-3OZJBiMKLOpVHgM9Rzc6BDo; ImeshVisitor=SubUser%3D%7Cadmln%3D0%7Cadmsales%3D0%7Ccd%3D08%2FAUG%2F2026%7Ccmid%3D10%7Cctid%3D70490%7Cem%3Dp%2A%2A%2A%2A%2A%2A%2A%2A%2A%2A%2A%2A%2A%2A%2A%2A%2A%40gmail.com%7Ceotp%3D%7Cev%3DV%7Cfn%3DGaurav%7Cglid%3D20262864%7Ciso%3DIN%7Cmb1%3D9879533323%7Cphcc%3D91%7Cpkrp%3D0%7Custs%3D%7Cutyp%3DP%7Cuv%3DV; userDet=glid=20262864|loc_pref=2|fcp_flag=0|image=http://5.imimg.com/data5/SELLER/GlPhoto/2023/1/LE/BW/EB/20262864/peratech-11-jpg-64x64.jpg|service_ids=236,328,374,364,364,359,361,233,280|logo=https://5.imimg.com/data5/SELLER/Logo/2025/3/494890937/KD/ER/NO/20262864/logo-old-1-90x90.png|psc_status=0|d_re=|u_url=https://www.paramengineering.co.in/|ast=A|lst=LST|ctid=70490|ct=Surat|stid=6480|st=Gujarat|enterprise=0|mod_st=F|rating=4.1|nach=0|iec=|is_suspect=0|vertical=KCD|pns_no=7942564174|gst=24BRAPD4073J1Z2|pan=BRAPD4073J|cin=|collectPayments=0|is_display_invoice_banner=0|is_display_enquiry=0|is_display_credit=0|disposition=I dont have it|disp_date=02/01/2026|recreateUserDetCookie=|vid=|did=|fid=|src_ID=2|locPref_enable=1|comp_name=Paratech Industries|hosting_date=16-Aug-2020|pay_later_navigation=0|pre_approved_loan_navigation=0; iploc=gcniso%3DIN%7Cgcnnm%3DIndia%7Cgctnm%3DRajkot%7Cgctid%3D70487%7Cgacrcy%3D100%7Cgip%3D47.11.107.252%7Cgstnm%3DGujarat; sessid=spv=2; xnHist=pv%3D0%7Cipv%3D7%7Cfpv%3D7%7Ccity%3Dundefined%7Clc_city%3Dundefined%7Ccvstate%3Dundefined%7Cpopupshown%3Dundefined%7Cinstall%3Dundefined%7Css%3Dundefined%7Cmb%3Dundefined%7Ctm%3Dundefined%7Cage%3Dundefined%7Ccount%3D4%7Ctime%3DSat%20Aug%2008%202026%2017%3A59%3A24%20GMT+0530%20%28India%20Standard%20Time%29%7Cglid%3D20262864%7Cgname%3Dundefined%7Cgemail%3Dundefined%7CcityID%3Dundefined; bl_tab_visibility=visible';
+
+async function main() {
+  try {
+    const res = await axios.post(
+      'https://seller.indiamart.com/blreact/getBLDisplayData',
+      {
+        LocPref: '2',
+        stateid: '',
+        city: '',
+        iso: '',
+        pref_city_lead: 0,
+        glusrid: '20262864',
+        inbox: '',
+        offer: '',
+        offer_type: 'B',
+        start: 1,
+        end: 20,
+        UsageTyp: '',
+        quantity: '',
+        is_email: '',
+        is_gst: '',
+        is_catalog: '',
+        is_mobnum: '',
+        is_busname: '',
+        mcatid: '',
+        sov: '',
+        eov: null,
+        enqType: '',
+        expired: '',
+      },
+      {
+        headers: {
+          accept: '*/*',
+          'accept-language': 'en-US,en;q=0.9',
+          'content-type': 'application/json',
+          origin: 'https://seller.indiamart.com',
+          referer: 'https://seller.indiamart.com/bltxn/?pref=recent',
+          'user-agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36',
+          Cookie: cookie,
+        },
+        validateStatus: () => true,
+      }
+    );
+
+    console.log('=== getBLDisplayData response ===');
+    console.log('Status:', res.status, res.statusText);
+
+    const outFile = path.join(__dirname, 'bl-display-data-response.json');
+    fs.writeFileSync(outFile, JSON.stringify(res.data, null, 2));
+    console.log('Full raw response saved to:', outFile);
+
+    const leads = res.data && res.data.DisplayList;
+    if (Array.isArray(leads)) {
+      console.log(`\n${leads.length} leads in this response:\n`);
+      leads.forEach((lead, i) => {
+        console.log(`#${i + 1} ETO_OFR_ID: ${lead.ETO_OFR_ID}`);
+        console.log(`   Title: ${lead.ETO_OFR_TITLE}`);
+        console.log(`   Buyer Name: ${lead.GLUSR_NAME}`);
+        console.log(`   Company: ${lead.GLUSR_COMPANY}`);
+        console.log(`   Email: ${lead.GLUSR_USR_EMAIL}`);
+        console.log(`   Mobile: ${lead.GLUSR_USR_PH_MOBILE}`);
+        console.log(`   Phone (STD/Number): ${lead.GLUSR_USR_PH_AREA || ''} ${lead.GLUSR_USR_PH_NUMBER || ''}`);
+        console.log(`   City/State: ${lead.GLUSR_CITY}, ${lead.GLUSR_STATE}`);
+        console.log(`   Posted: ${lead.OFFER_DATE} (${lead.BLDATETIME})`);
+        console.log(`   Credits to unlock: ${lead.ETO_CREDITS}`);
+        console.log('');
+      });
+    } else {
+      console.log('Body:', JSON.stringify(res.data, null, 2));
+    }
+  } catch (err) {
+    console.error('Request failed:', err.message);
+    if (err.response) {
+      console.error('Status:', err.response.status);
+      console.error('Body:', err.response.data);
+    }
+  }
+}
+
+main();

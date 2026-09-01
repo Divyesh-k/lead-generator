@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect IndiaMART</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="/js/theme.js"></script>
+    <style>
+        .connect-page {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: var(--spacing-xl) var(--spacing-sm);
+            position: relative;
+        }
+
+        .connect-header h1 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.75rem;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .connect-header h1 .icon, .connect-card h2 .icon {
+            color: var(--primary);
+        }
+
+        .connect-meta {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .connect-card {
+            padding: var(--spacing-lg);
+        }
+
+        .connect-card h2 {
+            font-size: 1.1rem;
+            margin-bottom: var(--spacing-xs);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .connect-card > p.hint {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .step-num {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-full);
+            background: var(--secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .step-body {
+            padding-top: 0.15rem;
+        }
+
+        .bookmarklet-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--success);
+            color: white;
+            padding: 0.6rem 1.1rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            text-decoration: none;
+            cursor: grab;
+            margin-top: 0.5rem;
+        }
+
+        .connect-footnote {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: var(--spacing-md);
+            border-top: 1px solid var(--border);
+            padding-top: var(--spacing-sm);
+        }
+
+        #connectStatus {
+            margin-bottom: var(--spacing-md);
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+        }
+
+        #connectStatus.connected {
+            background: hsla(142, 71%, 45%, 0.15);
+            color: var(--success);
+        }
+
+        #connectStatus.waiting {
+            background: hsla(38, 92%, 50%, 0.12);
+            color: var(--warning);
+        }
+
+        #connectStatus.error {
+            background: hsla(0, 84%, 60%, 0.12);
+            color: var(--error);
+        }
+
+        .fallback-code {
+            margin-top: 0.75rem;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            word-break: break-all;
+            background: var(--bg-tertiary);
+            padding: 0.5rem;
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
+            display: none;
+        }
+
+        .fallback-toggle {
+            font-size: 0.8rem;
+            color: var(--accent);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="connect-page">
+        <button id="themeToggle" class="theme-toggle" style="position: absolute; top: var(--spacing-xl); right: var(--spacing-sm);" aria-label="Toggle theme">
+            <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <div class="connect-header">
+            <h1><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Connect IndiaMART</h1>
+            <p class="connect-meta" id="connectMeta">Loading link details…</p>
+        </div>
+
+        <div id="connectStatus" class="waiting hidden">Waiting for connection…</div>
+
+        <div class="glass-card connect-card">
+            <h2>Connect your IndiaMART seller account</h2>
+            <p class="hint">Set up once, then connect in a single click. This never asks for your IndiaMART password — it only reads the session that's already in your browser after you log in normally.</p>
+
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-body">Show your browser's <strong>Bookmarks bar</strong> (Chrome/Edge: <code>Ctrl/Cmd+Shift+B</code>).</div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-body">
+                    <strong>Drag this button</strong> up onto your bookmarks bar:
+                    <div>
+                        <a href="#" id="bookmarkletLink" class="bookmarklet-btn"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Connect IndiaMART</a>
+                    </div>
+                    <span class="fallback-toggle" id="fallbackToggle">Drag &amp; drop not working?</span>
+                    <div class="fallback-code" id="fallbackCode"></div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-body">Open <a href="https://seller.indiamart.com" target="_blank" rel="noopener">IndiaMART</a> in a new tab and make sure you're <strong>logged in</strong>.</div>
+            </div>
+            <div class="step">
+                <div class="step-num">4</div>
+                <div class="step-body">Stay on that <strong>seller.indiamart.com tab</strong> (click into it so it's the active tab — not this instructions tab), then click the <strong>"Connect IndiaMART"</strong> bookmark from there. You'll see <em>"Connected"</em> — that's it.</div>
+            </div>
+
+            <p class="connect-footnote">This connect link works once. To reconnect later, generate a new link from your dashboard.</p>
+        </div>
+    </div>
+
+    <script>
+        const checkIcon = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right:0.4em;vertical-align:-0.15em;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+        const metaEl = document.getElementById('connectMeta');
+        const statusEl = document.getElementById('connectStatus');
+        const linkEl = document.getElementById('bookmarkletLink');
+        const fallbackToggle = document.getElementById('fallbackToggle');
+        const fallbackCode = document.getElementById('fallbackCode');
+
+        const API_URL = window.location.origin + '/api';
+
+        function buildBookmarklet(connectToken) {
+            const src = `
+                (function(){
+                    if (!/(^|\\.)indiamart\\.com$/.test(location.hostname)) {
+                        alert('This tab is ' + location.hostname + ', not seller.indiamart.com.\\n\\nSwitch to your IndiaMART tab first (click on it so it is the active tab), then click this bookmark again from there.');
+                        return;
+                    }
+                    var apiUrl = ${JSON.stringify(API_URL)};
+                    var t = ${JSON.stringify(connectToken)};
+                    fetch(apiUrl + '/indiamart/connect/' + t, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ cookie: document.cookie })
+                    }).then(function(r){ return r.json(); }).then(function(data){
+                        if (data.success) {
+                            alert('Connected to IndiaMART' + (data.data && data.data.companyName ? (' for ' + data.data.companyName) : '') + '! You can close this tab.');
+                        } else {
+                            alert('Could not connect: ' + (data.message || 'Unknown error'));
+                        }
+                    }).catch(function(err){
+                        alert('Connect failed: ' + err.message);
+                    });
+                })();
+            `.replace(/\s+/g, ' ');
+            return 'javascript:' + encodeURIComponent(src);
+        }
+
+        if (!token) {
+            metaEl.textContent = 'Missing connect token — generate a new link from your dashboard.';
+        } else {
+            fetch(API_URL + '/indiamart/connect/' + token + '/meta')
+                .then((r) => r.json())
+                .then((res) => {
+                    if (!res.success) {
+                        metaEl.textContent = res.message || 'This link is invalid or expired.';
+                        return;
+                    }
+                    const d = res.data;
+                    metaEl.textContent = `For: ${d.userName || 'your account'} · Link valid until ${new Date(d.expiresAt).toLocaleString()}`;
+
+                    const href = buildBookmarklet(token);
+                    linkEl.href = href;
+                    fallbackCode.textContent = href;
+
+                    if (d.alreadyConnected) {
+                        statusEl.classList.remove('hidden', 'waiting');
+                        statusEl.classList.add('connected');
+                        statusEl.innerHTML = checkIcon + 'Already connected.';
+                    } else {
+                        statusEl.classList.remove('hidden');
+                        statusEl.classList.add('waiting');
+                        statusEl.textContent = 'Waiting for you to click the bookmark on seller.indiamart.com…';
+                        pollStatus();
+                    }
+                })
+                .catch(() => {
+                    metaEl.textContent = 'Could not load link details. Try refreshing.';
+                });
+        }
+
+        fallbackToggle.addEventListener('click', () => {
+            fallbackCode.style.display = fallbackCode.style.display === 'block' ? 'none' : 'block';
+        });
+
+        let pollHandle = null;
+        function pollStatus() {
+            pollHandle = setInterval(() => {
+                fetch(API_URL + '/indiamart/connect/' + token + '/meta')
+                    .then((r) => r.json())
+                    .then((res) => {
+                        if (res.success && res.data.alreadyConnected) {
+                            statusEl.classList.remove('waiting');
+                            statusEl.classList.add('connected');
+                            statusEl.innerHTML = checkIcon + 'Connected! You can close this tab and return to your dashboard.';
+                            clearInterval(pollHandle);
+                        }
+                    })
+                    .catch(() => {});
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>

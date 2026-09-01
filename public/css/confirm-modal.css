@@ -1,0 +1,100 @@
+/* Delete Confirmation Modal */
+.confirm-modal {
+    max-width: 450px;
+    animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.confirm-modal-header {
+    text-align: center;
+    padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.confirm-icon {
+    display: flex;
+    justify-content: center;
+    color: var(--error);
+    margin-bottom: var(--spacing-sm);
+    animation: iconBounce 0.5s ease;
+}
+
+.confirm-icon .icon {
+    width: 3rem;
+    height: 3rem;
+}
+
+@keyframes iconBounce {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.confirm-modal-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.confirm-modal-content {
+    padding: var(--spacing-lg);
+    text-align: center;
+}
+
+.confirm-modal-content p {
+    font-size: 1.05rem;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.6;
+}
+
+.confirm-warning {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: var(--radius-md);
+    color: rgb(239, 68, 68);
+    font-size: 0.9rem !important;
+    font-weight: 600;
+    margin: 0 !important;
+}
+
+.confirm-modal-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg);
+    background: rgba(0, 0, 0, 0.05);
+    border-top: 1px solid var(--glass-border);
+}
+
+.confirm-modal-actions .btn {
+    flex: 1;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.confirm-modal-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep '\\\\.gz$')",
+      "Bash(git check-ignore *)",
+      "Bash(echo \"exit:$?\")"
+    ]
+  }
+}

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Karla:ital,wght@0,200..800;1,200..800&family=Poppins:wght@400;700&family=Roboto:ital,wght@0,400;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laser Machine Monitor</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">        
+        <p class="header">Leads Tracker 🤖</p>
+        <div class="button-container">
+            <button id="startButton">Start</button>
+            <button id="stopButton" class="btn-red">Stop</button>
+        </div>
+        <div class="status-container">
+            Status : <div id="status">---</div>
+        </div>
+        <div class="recent-leads">
+            <span class="Switch-Text">Recent leads : </span>
+            <label class="switch">
+                <input type="checkbox" id="recentLeadsSwitch" />
+                <span class="slider"></span>
+            </label>
+        </div>
+        <hr>
+
+        <div class="sessionStatus">
+            <div>
+                <label for="timer">Session :</label>
+                <input type="text" id="timer" class="timer none-pointer" placeholder="HH:MM:SS" disabled/>
+            </div>
+            <div>
+                <label for="noOfLeads">Leads : </label>
+                <input type="number" id="noOfLeads" class="noOfLeads none-pointer" placeholder="-" disabled/>
+            </div>
+            <div>
+                <label for="refreshTime">Interval :</label>
+                <div class="refresh-time-container">
+                    <input id="refreshTime" class="refreshTime" value="3" disabled maxlength="1"/>
+                    <i class="fa-solid fa-pen-to-square edit-icon" id="editIcon"></i>
+                </div>
+                
+            </div>
+        </div>
+
+        <hr id="horizontalBreakLeads">
+        <!-- leads table -->
+        <div class="table-wrapper">
+
+        </div>
+        <!-- leads table end -->
+
+        <hr>
+        <div class="connect-section">
+            <p class="header">Connect Dashboard 🔗</p>
+            <p class="connect-hint">Paste the connect code from your dashboard's "Connect IndiaMART" button, then click Connect while logged into IndiaMART.</p>
+            <input type="text" id="connectTokenInput" class="connect-input" placeholder="Paste connect code or link" />
+            <button id="connectDashboardBtn" class="connect-btn">Connect IndiaMART</button>
+            <div id="connectStatus" class="connect-status"></div>
+        </div>
+    </div>
+    <script src="main.js" ></script>
+</body>
+</html>

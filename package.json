@@ -1,0 +1,40 @@
+{
+  "name": "laser-lead-generator-saas",
+  "version": "1.0.0",
+  "description": "Enterprise Lead Generation SaaS Application",
+  "main": "server/server.js",
+  "engines": {
+    "node": "20.x"
+  },
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js",
+    "build:minify": "node build-minified.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "lead-generation",
+    "indiamart",
+    "saas"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.2",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^7.0.0",
+    "mongoose": "^8.0.3",
+    "multer": "^1.4.5-lts.1",
+    "papaparse": "^5.4.1",
+    "razorpay": "^2.9.6"
+  },
+  "devDependencies": {
+    "javascript-obfuscator": "^5.2.1",
+    "nodemon": "^3.0.2",
+    "terser": "^5.46.0"
+  }
+}
