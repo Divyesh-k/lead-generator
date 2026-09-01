@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: laser-lead-generator
+    name: lead-0
     runtime: node
     plan: free
     buildCommand: npm ci --omit=dev
