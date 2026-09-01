@@ -1,5 +1,5 @@
 // API Configuration
-const API_URL = 'http://localhost:5000/api';
+const API_URL = '/api';
 
 // Helper function to make API calls
 async function apiCall(endpoint, options = {}) {

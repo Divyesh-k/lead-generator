@@ -74,7 +74,7 @@ async function init() {
 // Load user info
 async function loadUserInfo() {
     try {
-        const response = await fetch('http://localhost:5000/api/auth/me', {
+        const response = await fetch('/api/auth/me', {
             headers: {
                 'Authorization': `Bearer ${token}`,
             },
@@ -105,7 +105,7 @@ async function loadUserInfo() {
 // Load subscription status
 async function loadSubscriptionStatus() {
     try {
-        const response = await fetch('http://localhost:5000/api/subscription/status', {
+        const response = await fetch('/api/subscription/status', {
             headers: {
                 'Authorization': `Bearer ${token}`,
             },
@@ -140,7 +140,7 @@ async function loadSubscriptionStatus() {
 // Load machines
 async function loadMachines() {
     try {
-        const response = await fetch('http://localhost:5000/api/machines', {
+        const response = await fetch('/api/machines', {
             headers: {
                 'Authorization': `Bearer ${token}`,
             },
@@ -233,7 +233,7 @@ function renderMachines() {
 // Toggle machine
 async function toggleMachine(machineId, isActive) {
     try {
-        const response = await fetch(`http://localhost:5000/api/machines/${machineId}`, {
+        const response = await fetch(`/api/machines/${machineId}`, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -260,7 +260,7 @@ async function deleteMachine(machineId) {
     if (!confirmed) return;
 
     try {
-        const response = await fetch(`http://localhost:5000/api/machines/${machineId}`, {
+        const response = await fetch(`/api/machines/${machineId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -317,7 +317,7 @@ document.getElementById('addMachineForm').addEventListener('submit', async (e) =
     const name = document.getElementById('machineName').value;
 
     try {
-        const response = await fetch('http://localhost:5000/api/machines', {
+        const response = await fetch('/api/machines', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -352,7 +352,7 @@ document.getElementById('csvFileInput').addEventListener('change', async (e) => 
     formData.append('file', file);
 
     try {
-        const response = await fetch('http://localhost:5000/api/machines/bulk', {
+        const response = await fetch('/api/machines/bulk', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -425,7 +425,7 @@ document.getElementById('upgradeBtn').addEventListener('click', async () => {
         paymentModal.classList.remove('hidden');
 
         // Create order
-        const response = await fetch('http://localhost:5000/api/payment/create-order', {
+        const response = await fetch('/api/payment/create-order', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -487,7 +487,7 @@ document.getElementById('upgradeBtn').addEventListener('click', async () => {
 
                 try {
                     // Verify payment
-                    const verifyResponse = await fetch('http://localhost:5000/api/payment/verify', {
+                    const verifyResponse = await fetch('/api/payment/verify', {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -622,7 +622,7 @@ document.getElementById('deleteSelectedBtn').addEventListener('click', async () 
     if (!confirmed) return;
 
     try {
-        const response = await fetch('http://localhost:5000/api/machines/bulk-delete', {
+        const response = await fetch('/api/machines/bulk-delete', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -680,7 +680,7 @@ document.getElementById('clearAllBtn').addEventListener('click', async () => {
     if (!confirmed) return;
 
     try {
-        const response = await fetch('http://localhost:5000/api/machines/clear-all', {
+        const response = await fetch('/api/machines/clear-all', {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -706,7 +706,7 @@ document.getElementById('activateSelectedBtn').addEventListener('click', async (
     if (selectedMachines.length === 0) return;
 
     try {
-        const response = await fetch('http://localhost:5000/api/machines/bulk-toggle', {
+        const response = await fetch('/api/machines/bulk-toggle', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -756,7 +756,7 @@ document.getElementById('deactivateSelectedBtn').addEventListener('click', async
     if (selectedMachines.length === 0) return;
 
     try {
-        const response = await fetch('http://localhost:5000/api/machines/bulk-toggle', {
+        const response = await fetch('/api/machines/bulk-toggle', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
