@@ -979,6 +979,33 @@
     cursor: not-allowed;
 }
 
+/* ---------- Detail row (label/value pairs, e.g. lead detail modal) ---------- */
+.detail-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.88rem;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-row-label {
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.detail-row-value {
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: right;
+    word-break: break-word;
+}
+
 /* ---------- Form grid ---------- */
 .form-grid {
     display: grid;

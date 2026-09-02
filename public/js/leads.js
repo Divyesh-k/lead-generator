@@ -102,11 +102,11 @@
         noResultsState.classList.add('hidden');
         tableWrap.classList.remove('hidden');
 
-        tbody.innerHTML = filteredLeads.map((lead) => {
+        tbody.innerHTML = filteredLeads.map((lead, i) => {
             const cityState = [lead.buyerCity, lead.buyerState].filter(Boolean).join(', ');
             const mobile = lead.buyerMobile ? `+${lead.buyerMobileCountry || '91'} ${lead.buyerMobile}` : '-';
             return `
-            <tr>
+            <tr class="lead-row" data-index="${i}" style="cursor:pointer;">
                 <td>${escapeHtml(lead.title || '-')}</td>
                 <td>${lead.unlocked ? escapeHtml(lead.buyerName || '-') : `<span class="lead-locked">${svgIcon('lock')}Locked</span>`}</td>
                 <td>${lead.unlocked ? escapeHtml(lead.buyerEmail || '-') : '-'}</td>
@@ -118,7 +118,59 @@
                 <td>${lead.scrapedAt ? new Date(lead.scrapedAt).toLocaleString() : '-'}</td>
             </tr>`;
         }).join('');
+
+        tbody.querySelectorAll('tr.lead-row').forEach((row) => {
+            row.addEventListener('click', () => openLeadDetail(filteredLeads[Number(row.dataset.index)]));
+        });
     }
+
+    // ===== Lead detail modal =====
+    const leadDetailModal = document.getElementById('leadDetailModal');
+    const leadDetailBody = document.getElementById('leadDetailBody');
+    document.getElementById('leadDetailCloseIcon').innerHTML = svgIcon('x');
+
+    function detailRow(label, value) {
+        return `<div class="detail-row"><span class="detail-row-label">${escapeHtml(label)}</span><span class="detail-row-value">${value}</span></div>`;
+    }
+
+    function openLeadDetail(lead) {
+        if (!lead) return;
+
+        const cityState = [lead.buyerCity, lead.buyerState, lead.buyerCountry].filter(Boolean).join(', ');
+        const mobile = lead.buyerMobile ? `+${lead.buyerMobileCountry || '91'} ${lead.buyerMobile}` : null;
+        const lockedNote = !lead.unlocked
+            ? `<div class="empty-state" style="padding: 1rem 0 1.25rem;"><p style="margin:0;">${svgIcon('lock')} Buyer contact details are locked. Unlock this lead from the Auto-Scrape page to reveal them.</p></div>`
+            : '';
+
+        document.getElementById('leadDetailTitle').textContent = lead.title || 'Lead Details';
+
+        leadDetailBody.innerHTML = `
+            ${lockedNote}
+            ${detailRow('Product', escapeHtml(lead.title || '-'))}
+            ${lead.category ? detailRow('Category', escapeHtml(lead.category)) : ''}
+            ${lead.approxOrderValue ? detailRow('Approx. order value', escapeHtml(lead.approxOrderValue)) : ''}
+            ${detailRow('Status', lead.unlocked ? `<span class="status-pill status-active">Unlocked</span>` : `<span class="status-pill status-stopped">Locked</span>`)}
+            ${lead.unlocked ? detailRow('Buyer name', escapeHtml(lead.buyerName || '-')) : ''}
+            ${lead.unlocked ? detailRow('Company', escapeHtml(lead.buyerCompany || 'Not provided')) : ''}
+            ${lead.unlocked ? detailRow('Email', escapeHtml(lead.buyerEmail || '-')) : ''}
+            ${lead.unlocked && mobile ? detailRow('Mobile', escapeHtml(mobile)) : ''}
+            ${lead.unlocked && cityState ? detailRow('Location', escapeHtml(cityState)) : ''}
+            ${lead.unlocked && lead.memberSince ? detailRow('IndiaMART member since', escapeHtml(lead.memberSince)) : ''}
+            ${lead.unlocked ? detailRow('Credits spent', String(lead.creditsSpent ?? '-')) : ''}
+            ${detailRow('Scraped at', lead.scrapedAt ? new Date(lead.scrapedAt).toLocaleString() : '-')}
+        `;
+
+        leadDetailModal.classList.remove('hidden');
+    }
+
+    function closeLeadDetail() {
+        leadDetailModal.classList.add('hidden');
+    }
+
+    document.getElementById('leadDetailCloseBtn').addEventListener('click', closeLeadDetail);
+    leadDetailModal.addEventListener('click', (e) => {
+        if (e.target === leadDetailModal) closeLeadDetail();
+    });
 
     searchInput.addEventListener('input', (e) => {
         searchTerm = e.target.value;

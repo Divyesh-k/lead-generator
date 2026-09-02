@@ -284,43 +284,6 @@
 
         .terms-row input { margin-top: 0.2rem; accent-color: var(--primary); }
 
-        .error-message {
-            background: hsla(0, 72%, 51%, 0.1);
-            border: 1px solid var(--error);
-            color: var(--error);
-            padding: 0.75rem 1rem;
-            border-radius: var(--radius-sm);
-            margin-bottom: var(--spacing-md);
-            display: none;
-            font-size: 0.88rem;
-        }
-
-        .error-message.show {
-            display: block;
-            animation: shake 0.4s;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-8px); }
-            75% { transform: translateX(8px); }
-        }
-
-        .success-message {
-            background: hsla(160, 84%, 33%, 0.1);
-            border: 1px solid var(--success);
-            color: var(--success);
-            padding: 0.75rem 1rem;
-            border-radius: var(--radius-sm);
-            margin-bottom: var(--spacing-md);
-            display: none;
-            font-size: 0.88rem;
-        }
-
-        .success-message.show {
-            display: block;
-            animation: fadeIn var(--transition-base);
-        }
 
         .auth-footnote {
             text-align: center;
@@ -436,7 +399,7 @@
                             <input type="checkbox" checked>
                             Remember me
                         </label>
-                        <a href="mailto:support@laserleadgenerator.com" class="forgot-link">Forgot password?</a>
+                        <a href="/forgot-password.html" class="forgot-link">Forgot password?</a>
                     </div>
 
                     <button type="submit" class="btn btn-primary" style="width: 100%;">
