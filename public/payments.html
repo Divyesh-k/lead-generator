@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payments — NexLead</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/app-shell.css">
+    <link rel="icon" type="image/png" href="/images/favicon-32.png">
+    <link rel="apple-touch-icon" href="/images/favicon-180.png">
+    <script src="/js/theme.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        .pricing-card.current {
+            border-color: var(--success);
+        }
+
+        .pricing-current-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--success);
+            background: hsla(160, 84%, 33%, 0.12);
+            padding: 0.25rem 0.7rem;
+            border-radius: var(--radius-full);
+            margin-bottom: 0.6rem;
+        }
+
+        .pricing-note {
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            margin-top: 0.75rem;
+        }
+    </style>
+</head>
+<body data-page="payments" data-title="Payments" data-desc="Manage your subscription plan">
+    <div class="app-shell">
+        <main class="app-main" id="appMain">
+            <div class="app-content" id="appContent">
+
+                <div class="section">
+                    <div class="section-header">
+                        <div>
+                            <h2>Choose your plan</h2>
+                            <p class="section-subtitle">One flat Pro price — no tiers, no surprises.</p>
+                        </div>
+                    </div>
+
+                    <div class="pricing-grid" id="pricingGrid">
+                        <div class="pricing-card" id="freePricingCard"></div>
+                        <div class="pricing-card popular" id="proPricingCard"></div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Payment Processing Modal -->
+    <div id="paymentModal" class="modal-overlay hidden">
+        <div class="modal">
+            <h3 class="mb-3">Processing Payment</h3>
+            <div id="paymentStatus" class="text-center">
+                <div class="spinner" style="margin: 1rem auto;"></div>
+                <p class="text-secondary mt-3">Please wait while we process your payment...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/icons.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/app-shell.js"></script>
+    <script src="/js/payments.js"></script>
+</body>
+</html>

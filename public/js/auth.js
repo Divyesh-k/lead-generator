@@ -1,21 +1,34 @@
 // Tab switching
 const tabs = document.querySelectorAll('.auth-tab');
 const forms = document.querySelectorAll('.auth-form');
+const authShell = document.getElementById('authShell');
+
+function activateTab(targetTab) {
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === targetTab));
+    forms.forEach(f => f.classList.remove('active'));
+    document.getElementById(`${targetTab}Form`).classList.add('active');
+    if (authShell) authShell.dataset.mode = targetTab;
+    hideMessages();
+}
 
 tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-        const targetTab = tab.dataset.tab;
+    tab.addEventListener('click', () => activateTab(tab.dataset.tab));
+});
 
-        // Update active tab
-        tabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
+// Deep-link support: /auth.html?tab=register
+const requestedTab = new URLSearchParams(window.location.search).get('tab');
+if (requestedTab === 'register') {
+    activateTab('register');
+}
 
-        // Update active form
-        forms.forEach(f => f.classList.remove('active'));
-        document.getElementById(`${targetTab}Form`).classList.add('active');
-
-        // Clear messages
-        hideMessages();
+// Show/hide password toggles
+document.querySelectorAll('.password-toggle').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+        const input = document.getElementById(toggle.dataset.target);
+        if (!input) return;
+        const isHidden = input.type === 'password';
+        input.type = isHidden ? 'text' : 'password';
+        toggle.innerHTML = svgIcon(isHidden ? 'eye-off' : 'eye');
     });
 });
 

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings — NexLead</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/app-shell.css">
+    <link rel="icon" type="image/png" href="/images/favicon-32.png">
+    <link rel="apple-touch-icon" href="/images/favicon-180.png">
+    <script src="/js/theme.js"></script>
+    <style>
+        .settings-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.4rem;
+            box-shadow: var(--shadow);
+        }
+
+        .settings-card h3 {
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .settings-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.65rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.88rem;
+        }
+
+        .settings-row:last-child {
+            border-bottom: none;
+        }
+
+        .settings-row-label {
+            color: var(--text-secondary);
+        }
+
+        .settings-row-value {
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: right;
+        }
+
+        .settings-profile-header {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .settings-profile-header .avatar-initials {
+            width: 3rem;
+            height: 3rem;
+            font-size: 1.1rem;
+        }
+
+        .settings-profile-name {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .settings-profile-email {
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+        }
+
+        .usage-bar-track {
+            width: 100%;
+            height: 8px;
+            border-radius: var(--radius-full);
+            background: var(--bg-tertiary);
+            overflow: hidden;
+            margin: 0.6rem 0 0.35rem;
+        }
+
+        .usage-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: var(--radius-full);
+        }
+
+        .usage-bar-label {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body data-page="settings" data-title="Settings" data-desc="Your account and subscription overview">
+    <div class="app-shell">
+        <main class="app-main" id="appMain">
+            <div class="app-content" id="appContent">
+
+                <div class="section">
+                    <div class="card-grid">
+
+                        <div class="settings-card">
+                            <h3 id="accountCardTitle"></h3>
+                            <div class="settings-profile-header">
+                                <div class="avatar-initials" id="settingsAvatar">?</div>
+                                <div>
+                                    <div class="settings-profile-name" id="settingsName">&nbsp;</div>
+                                    <div class="settings-profile-email" id="settingsEmail">&nbsp;</div>
+                                </div>
+                            </div>
+                            <p class="text-muted" style="font-size: 0.78rem;">Account details are managed by your login provider — there's no self-service editing yet.</p>
+                        </div>
+
+                        <div class="settings-card">
+                            <h3 id="planCardTitle"></h3>
+                            <div class="settings-row">
+                                <span class="settings-row-label">Current plan</span>
+                                <span class="settings-row-value" id="settingsPlanBadge">&nbsp;</span>
+                            </div>
+                            <div class="settings-row" id="settingsExpiryRow">
+                                <span class="settings-row-label">Renews / expires</span>
+                                <span class="settings-row-value" id="settingsExpiry">—</span>
+                            </div>
+                            <a href="/payments.html" class="btn btn-primary btn-sm mt-3" style="width: 100%;" id="manageSubBtn">Manage subscription</a>
+                        </div>
+
+                        <div class="settings-card">
+                            <h3 id="usageCardTitle"></h3>
+                            <div class="usage-bar-label" id="usageLabel">Loading…</div>
+                            <div class="usage-bar-track">
+                                <div class="usage-bar-fill" id="usageBarFill" style="width: 0%;"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="settings-card" style="max-width: 420px;">
+                        <h3 id="accountActionsTitle"></h3>
+                        <p class="text-secondary mb-3" style="font-size: 0.85rem;">Sign out of NexLead on this device.</p>
+                        <button id="settingsLogoutBtn" class="btn btn-secondary" type="button" style="width: 100%;">Logout</button>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/icons.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/app-shell.js"></script>
+    <script src="/js/settings.js"></script>
+</body>
+</html>

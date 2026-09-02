@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Scrape — NexLead</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/app-shell.css">
+    <link rel="icon" type="image/png" href="/images/favicon-32.png">
+    <link rel="apple-touch-icon" href="/images/favicon-180.png">
+    <script src="/js/theme.js"></script>
+    <style>
+        .im-card-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 160px;
+        }
+
+        .im-status-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .im-company {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+        }
+
+        .im-hint {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 0.35rem;
+        }
+
+        #imStatusCard .empty-state {
+            padding: 2rem 1rem;
+        }
+
+        #autoScrapeSection .toggle-row {
+            border-bottom: none;
+            padding-top: 0;
+        }
+
+        .connect-link-row {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body data-page="auto-scrape" data-title="Auto-Scrape" data-desc="Connect IndiaMART and automate buy-lead scraping">
+    <div class="app-shell">
+        <main class="app-main" id="appMain">
+            <div class="app-content" id="appContent">
+
+                <div class="section">
+                    <div class="section-header">
+                        <div>
+                            <h2>IndiaMART Connection</h2>
+                            <p class="section-subtitle">Connect your IndiaMART seller account to pull and unlock buy-leads directly from this dashboard.</p>
+                        </div>
+                    </div>
+                    <div class="glass-card" id="imStatusCard">
+                        <div class="im-card-loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+
+                <div class="section hidden" id="autoScrapeSection">
+                    <div class="section-header">
+                        <div>
+                            <h2>Auto-Scrape Schedule</h2>
+                            <p class="section-subtitle">Automatically pull new buy-leads on a schedule and unlock up to the limit below each run. Every unlock spends real IndiaMART credits.</p>
+                        </div>
+                    </div>
+                    <div class="glass-card">
+                        <div id="autoScrapeRunning" class="hidden">
+                            <div class="toggle-row">
+                                <div>
+                                    <div class="toggle-row-label">Auto-scrape is running</div>
+                                    <div class="toggle-row-desc" id="autoScrapeRunningDesc"></div>
+                                </div>
+                                <button id="stopAutoScrapeBtn" class="btn btn-error btn-sm" type="button">Stop Auto-Scrape</button>
+                            </div>
+                        </div>
+                        <form id="autoScrapeForm">
+                            <div class="form-grid">
+                                <div class="input-group">
+                                    <label for="autoScrapeInterval">Interval (minutes)</label>
+                                    <input type="number" id="autoScrapeInterval" class="input" value="15" min="5" max="120" required>
+                                </div>
+                                <div class="input-group">
+                                    <label for="autoScrapeUnlockLimit">Unlock limit per run</label>
+                                    <input type="number" id="autoScrapeUnlockLimit" class="input" value="2" min="0" max="10" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="startAutoScrapeBtn">Start Auto-Scrape</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Connect IndiaMART Modal -->
+    <div id="imConnectModal" class="modal-overlay hidden">
+        <div class="modal">
+            <h3 class="mb-3">Connect IndiaMART</h3>
+            <p class="text-secondary mb-3">We opened a connect page in a new tab and generated a one-time link. Follow the steps there, then come back here — this page will pick up the connection automatically.</p>
+            <div class="input-group">
+                <input type="text" id="imConnectLinkInput" class="input" readonly>
+            </div>
+            <div class="connect-link-row">
+                <a id="imOpenLinkBtn" href="#" target="_blank" rel="noopener" class="btn btn-primary">Open Connect Link</a>
+                <button id="imCopyLinkBtn" class="btn btn-secondary" type="button">Copy Link</button>
+                <button id="imCloseConnectModal" class="btn btn-secondary" type="button">Close</button>
+            </div>
+            <p class="text-muted mt-3" style="font-size: 0.8rem;">Waiting for you to complete the steps on that page — this will update automatically.</p>
+        </div>
+    </div>
+
+    <script src="/js/icons.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/app-shell.js"></script>
+    <script src="/js/auto-scrape.js"></script>
+</body>
+</html>

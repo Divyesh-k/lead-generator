@@ -1,293 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Lead Generator</title>
+    <title>Dashboard — NexLead</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/dashboard.css">
-    <link rel="stylesheet" href="/css/tabs.css">
-    <link rel="stylesheet" href="/css/confirm-modal.css">
+    <link rel="stylesheet" href="/css/app-shell.css">
+    <link rel="icon" type="image/png" href="/images/favicon-32.png">
+    <link rel="apple-touch-icon" href="/images/favicon-180.png">
     <script src="/js/theme.js"></script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        .connect-prompt-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .connect-prompt-card h3 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .connect-prompt-card p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .chart-line {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .chart-area {
+            fill: var(--primary);
+            opacity: 0.14;
+        }
+
+        .chart-axis {
+            stroke: var(--border);
+            stroke-width: 1;
+        }
+
+        .chart-dot {
+            fill: var(--primary);
+            stroke: var(--bg-secondary);
+            stroke-width: 2;
+        }
+
+        .chart-label {
+            fill: var(--text-muted);
+            font-size: 11px;
+            font-family: var(--font-body);
+        }
+
+        .recent-leads-title {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .recent-leads-locked {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            color: var(--text-muted);
+        }
+    </style>
 </head>
+<body data-page="dashboard" data-title="Dashboard" data-desc="Overview of your machines and IndiaMART leads">
+    <div class="app-shell">
+        <main class="app-main" id="appMain">
+            <div class="app-content" id="appContent">
 
-<body>
-    <!-- Auth Loading Overlay -->
-    <div id="authLoader" class="auth-loader">
-        <div class="loader-content">
-            <div class="loader-spinner"></div>
-            <p class="loader-text">Loading...</p>
-        </div>
-    </div>
-
-    <!-- Header -->
-    <header class="dashboard-header">
-        <div class="container">
-            <div class="header-content">
-                <h1><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Lead Generator</h1>
-                <div class="header-actions">
-                    <div class="user-info">
-                        <span id="userName" class="text-secondary"></span>
-                        <span id="subscriptionBadge" class="badge badge-free">Free</span>
+                <div class="metric-grid" id="metricGrid">
+                    <div class="metric-card">
+                        <div class="metric-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></div>
+                        <div class="metric-body">
+                            <div class="metric-label">Active Machines</div>
+                            <div class="metric-value" id="metricActiveMachines"><div class="skeleton" style="width:2.5rem;height:1.6rem;"></div></div>
+                            <div class="metric-sub" id="metricActiveMachinesSub"></div>
+                            <a href="/machines.html" class="metric-link">Manage machines <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+                        </div>
                     </div>
-                    <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
-                        <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                        <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                    </button>
-                    <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+                    <div class="metric-card">
+                        <div class="metric-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+                        <div class="metric-body">
+                            <div class="metric-label">IndiaMART Leads</div>
+                            <div class="metric-value" id="metricUnlockedLeads"><div class="skeleton" style="width:2.5rem;height:1.6rem;"></div></div>
+                            <div class="metric-sub" id="metricUnlockedLeadsSub"></div>
+                            <a href="/leads.html" class="metric-link">View leads <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+                        <div class="metric-body">
+                            <div class="metric-label">Credit Balance</div>
+                            <div class="metric-value" id="metricCreditBalance"><div class="skeleton" style="width:2.5rem;height:1.6rem;"></div></div>
+                            <div class="metric-sub" id="metricCreditBalanceSub"></div>
+                            <a href="/auto-scrape.html" class="metric-link">IndiaMART connection <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+                        <div class="metric-body">
+                            <div class="metric-label">Auto-Scrape</div>
+                            <div class="metric-value"><span class="status-pill status-stopped" id="metricAutoScrapePill">Stopped</span></div>
+                            <div class="metric-sub" id="metricAutoScrapeSub"></div>
+                            <a href="/auto-scrape.html" class="metric-link" id="metricAutoScrapeLink">Manage <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </header>
 
-    <!-- Main Content -->
-    <main class="container">
-        <!-- Stats Cards -->
-        <div class="stats-grid">
-            <div class="stat-card glass-card">
-                <div class="stat-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></div>
-                <div class="stat-content">
-                    <div class="stat-label">Active Machines</div>
-                    <div class="stat-value" id="activeMachinesCount">0</div>
-                    <div class="stat-limit" id="machineLimit"></div>
+                <div class="section">
+                    <div class="section-header">
+                        <div>
+                            <h2>Leads Overview</h2>
+                            <p class="section-subtitle" id="leadsChartSubtitle">Unlocked IndiaMART leads over the last 7 days</p>
+                        </div>
+                        <div class="section-actions">
+                            <select id="chartRangeSelect" class="input" style="width:auto;padding:0.5rem 2rem 0.5rem 0.9rem;">
+                                <option value="days">Last 7 Days</option>
+                                <option value="weeks">Last 8 Weeks</option>
+                                <option value="months">Last 12 Months</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="glass-card chart-container" id="leadsChartWrap">
+                        <div class="skeleton" style="height:220px;"></div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="stat-card glass-card">
-                <div class="stat-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
-                <div class="stat-content">
-                    <div class="stat-label">IndiaMART Leads</div>
-                    <div class="stat-value" id="totalLeadsCount">0</div>
+                <div class="section">
+                    <div class="section-header">
+                        <div>
+                            <h2>Recent Leads</h2>
+                        </div>
+                        <div class="section-actions">
+                            <a href="/leads.html" class="btn btn-secondary btn-sm"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>View All</a>
+                        </div>
+                    </div>
+                    <div id="recentLeadsWrap">
+                        <div class="glass-card" style="display:flex;flex-direction:column;gap:0.75rem;">
+                            <div class="skeleton" style="height:2.5rem;"></div>
+                            <div class="skeleton" style="height:2.5rem;"></div>
+                            <div class="skeleton" style="height:2.5rem;"></div>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="stat-card glass-card">
-                <div class="stat-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
-                <div class="stat-content">
-                    <div class="stat-label">Credit Balance</div>
-                    <div class="stat-value" id="statCreditBalance">-</div>
+                <div class="section">
+                    <div class="section-header">
+                        <div>
+                            <h2>Quick Actions</h2>
+                        </div>
+                    </div>
+                    <div class="quick-actions-grid">
+                        <a href="/machines.html" class="quick-action-card">
+                            <div class="quick-action-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></div>
+                            <div>
+                                <div class="quick-action-title">Add Machine</div>
+                                <div class="quick-action-desc">Register a new laser machine</div>
+                            </div>
+                        </a>
+                        <a href="/csv-upload.html" class="quick-action-card">
+                            <div class="quick-action-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 16l-4-4-4 4"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/><polyline points="16 16 12 12 8 16"/></svg></div>
+                            <div>
+                                <div class="quick-action-title">Upload CSV</div>
+                                <div class="quick-action-desc">Bulk-import machines from a file</div>
+                            </div>
+                        </a>
+                        <a href="/search-machines.html" class="quick-action-card">
+                            <div class="quick-action-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+                            <div>
+                                <div class="quick-action-title">Search Machines</div>
+                                <div class="quick-action-desc">Find and toggle machines by name</div>
+                            </div>
+                        </a>
+                        <a href="/auto-scrape.html" class="quick-action-card">
+                            <div class="quick-action-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+                            <div>
+                                <div class="quick-action-title">Auto-Scrape Settings</div>
+                                <div class="quick-action-desc">Connect IndiaMART and schedule scrapes</div>
+                            </div>
+                        </a>
+                    </div>
                 </div>
-            </div>
 
-            <div class="stat-card glass-card">
-                <div class="stat-icon" id="statusIcon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></div>
-                <div class="stat-content">
-                    <div class="stat-label">Auto-Scrape</div>
-                    <div class="stat-value" id="generationStatus">Stopped</div>
-                </div>
             </div>
-        </div>
-
-        <!-- IndiaMART Connection Section -->
-        <section class="section">
-            <div class="section-header">
-                <h2>IndiaMART Connection</h2>
-                <div class="section-actions">
-                    <button id="imConnectBtn" class="btn btn-primary"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Connect IndiaMART</button>
-                    <button id="imDisconnectBtn" class="btn btn-secondary hidden">Disconnect</button>
-                    <button id="imScrapeBtn" class="btn btn-success hidden"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Scrape Leads</button>
-                    <button id="startGenerationBtn" class="btn btn-success hidden"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>Start Auto-Scrape</button>
-                    <button id="stopGenerationBtn" class="btn btn-error hidden"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>Stop Auto-Scrape</button>
-                    <button id="imExportLeadsBtn" class="btn btn-secondary"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export CSV</button>
-                </div>
-            </div>
-
-            <div class="glass-card im-status-card">
-                <div class="im-status-row">
-                    <span id="imStatusBadge" class="badge badge-free">Not Connected</span>
-                    <span id="imCompanyName" class="text-secondary"></span>
-                </div>
-                <div id="imStatusDetails" class="im-status-details hidden">
-                    <div><span class="text-muted">IndiaMART User ID:</span> <span id="imGlusrid">-</span></div>
-                    <div><span class="text-muted">Credit balance:</span> <span id="imCreditBalance">-</span></div>
-                    <div><span class="text-muted">Buylead purchases left:</span> <span id="imPurchaseBalance">-</span></div>
-                    <div><span class="text-muted">Last scraped:</span> <span id="imLastScraped">Never</span></div>
-                    <div><span class="text-muted">Auto-scrape:</span> <span id="imAutoScrapeInfo">Off</span></div>
-                </div>
-                <p id="imHint" class="text-secondary im-hint">Connect your IndiaMART seller account to start pulling and unlocking buy-leads directly from your dashboard.</p>
-            </div>
-
-            <div class="table-container" id="imLeadsTableWrap" style="margin-top: var(--spacing-md);">
-                <table id="imLeadsTable">
-                    <thead>
-                        <tr>
-                            <th>Product</th>
-                            <th>Buyer Name</th>
-                            <th>Email</th>
-                            <th>Mobile</th>
-                            <th>City/State</th>
-                            <th>Company</th>
-                            <th>Member Since</th>
-                            <th>Credits</th>
-                            <th>Scraped</th>
-                        </tr>
-                    </thead>
-                    <tbody id="imLeadsTableBody"></tbody>
-                </table>
-            </div>
-            <div id="imNoLeads" class="empty-state">
-                <p>No IndiaMART leads scraped yet. Connect your account and click "Scrape Leads" (or turn on Auto-Scrape) to pull recent buy-leads.</p>
-            </div>
-        </section>
-
-        <!-- Connect IndiaMART Modal -->
-        <div id="imConnectModal" class="modal-overlay hidden">
-            <div class="modal">
-                <h3 class="mb-3">Connect IndiaMART</h3>
-                <p class="text-secondary mb-3">We opened a connect page in a new tab and generated a one-time link. Follow the steps there, then come back here — this dashboard will pick up the connection automatically.</p>
-                <div class="input-group">
-                    <input type="text" id="imConnectLinkInput" class="input" readonly>
-                </div>
-                <div class="flex gap-2 mt-3">
-                    <a id="imOpenLinkBtn" href="#" target="_blank" rel="noopener" class="btn btn-primary">Open Connect Link</a>
-                    <button id="imCopyLinkBtn" class="btn btn-secondary">Copy Link</button>
-                    <button id="imCloseConnectModal" class="btn btn-secondary">Close</button>
-                </div>
-                <p class="text-muted mt-3" style="font-size: 0.8rem;">Waiting for you to complete the steps on that page — this will update automatically.</p>
-            </div>
-        </div>
-
-        <!-- Machine Management Section -->
-        <section class="section">
-            <div class="section-header">
-                <h2>Machine Management</h2>
-                <div class="section-actions">
-                    <button id="selectToDeleteBtn" class="btn btn-secondary"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Select to Delete</button>
-                    <button id="deleteSelectedBtn" class="btn btn-error hidden"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete Selected</button>
-                    <button id="activateSelectedBtn" class="btn btn-success hidden"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Activate Selected</button>
-                    <button id="deactivateSelectedBtn" class="btn btn-warning hidden"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Deactivate Selected</button>
-                    <button id="clearAllBtn" class="btn btn-error"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Clear All</button>
-                    <button id="addMachineBtn" class="btn btn-secondary">+ Add Machine</button>
-                    <button id="uploadCsvBtn" class="btn btn-primary"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload CSV</button>
-                    <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
-                </div>
-            </div>
-
-            <div id="upgradePrompt" class="upgrade-prompt hidden">
-                <p><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Upgrade to <strong>Pro</strong> for unlimited machines!</p>
-                <button id="upgradeBtn" class="btn btn-primary btn-sm">Upgrade Now</button>
-            </div>
-
-
-            <div class="machine-search">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" id="machineSearchInput" class="input" placeholder="Search machines by name...">
-            </div>
-
-            <!-- Machine Tabs -->
-            <div class="machine-tabs">
-                <button class="tab-btn active" data-tab="active">
-                    <span class="tab-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></span> Active Machines
-                    <span class="tab-count" id="activeTabCount">0</span>
-                </button>
-                <button class="tab-btn" data-tab="inactive">
-                    <span class="tab-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></span> Inactive Machines
-                    <span class="tab-count" id="inactiveTabCount">0</span>
-                </button>
-            </div>
-
-            <!-- Tab Content -->
-            <div class="tab-content active" id="activeTab">
-                <div id="activeMachinesContainer" class="machines-grid">
-                    <!-- Active machines will be loaded here -->
-                </div>
-                <div id="noActiveMachines" class="empty-state hidden">
-                    <p>No active machines. Activate some machines to see them here!</p>
-                </div>
-            </div>
-
-            <div class="tab-content" id="inactiveTab">
-                <div id="inactiveMachinesContainer" class="machines-grid">
-                    <!-- Inactive machines will be loaded here -->
-                </div>
-                <div id="noInactiveMachines" class="empty-state hidden">
-                    <p>No inactive machines. All your machines are active!</p>
-                </div>
-            </div>
-
-            <div id="noMachines" class="empty-state hidden">
-                <p>No machines yet. Add your first machine to get started!</p>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Add Machine Modal -->
-    <div id="addMachineModal" class="modal-overlay hidden">
-        <div class="modal">
-            <h3 class="mb-3">Add New Machine</h3>
-            <form id="addMachineForm">
-                <div class="input-group">
-                    <label for="machineName">Machine Name</label>
-                    <input type="text" id="machineName" class="input" placeholder="Enter machine name" required>
-                </div>
-                <div class="flex gap-2">
-                    <button type="submit" class="btn btn-primary">Add Machine</button>
-                    <button type="button" id="cancelAddMachine" class="btn btn-secondary">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Start Generation Modal -->
-    <div id="startGenerationModal" class="modal-overlay hidden">
-        <div class="modal">
-            <h3 class="mb-3">Configure Auto-Scrape</h3>
-            <p class="text-secondary mb-3" style="font-size: 0.85rem;">Automatically pulls new IndiaMART buy-leads on a schedule and unlocks up to the limit below each run. Every unlock spends real credits.</p>
-            <form id="startGenerationForm">
-                <div class="input-group">
-                    <label for="autoScrapeInterval">Interval (minutes)</label>
-                    <input type="number" id="autoScrapeInterval" class="input" value="15" min="5" max="120" required>
-                </div>
-                <div class="input-group">
-                    <label for="autoScrapeUnlockLimit">Unlock limit per run</label>
-                    <input type="number" id="autoScrapeUnlockLimit" class="input" value="2" min="0" max="10" required>
-                </div>
-                <div class="flex gap-2">
-                    <button type="submit" class="btn btn-success">Start Auto-Scrape</button>
-                    <button type="button" id="cancelStartGeneration" class="btn btn-secondary">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Payment Processing Modal -->
-    <div id="paymentModal" class="modal-overlay hidden">
-        <div class="modal">
-            <h3 class="mb-3">Processing Payment</h3>
-            <div id="paymentStatus" class="text-center">
-                <div class="payment-loader"></div>
-                <p class="text-secondary mt-3">Please wait while we process your payment...</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteConfirmModal" class="modal-overlay hidden">
-        <div class="modal confirm-modal">
-            <div class="confirm-modal-header">
-                <div class="confirm-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>
-                <h3>Confirm Deletion</h3>
-            </div>
-            <div class="confirm-modal-content">
-                <p id="deleteConfirmMessage">Are you sure you want to delete this item?</p>
-                <p class="confirm-warning"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> This action cannot be undone!</p>
-            </div>
-            <div class="confirm-modal-actions">
-                <button id="confirmDeleteBtn" class="btn btn-error">Delete</button>
-                <button id="cancelDeleteBtn" class="btn btn-secondary">Cancel</button>
-            </div>
-        </div>
+        </main>
     </div>
 
     <script src="/js/icons.js"></script>
     <script src="/js/api.js"></script>
-    <script src="/js/dashboard.js"></script>
+    <script src="/js/app-shell.js"></script>
+    <script src="/js/dashboard-home.js"></script>
 </body>
-
 </html>

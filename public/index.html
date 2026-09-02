@@ -4,115 +4,1151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lead Generator - Welcome</title>
+    <title>NexLead — Automated IndiaMART Lead Generation</title>
+    <meta name="description" content="NexLead helps businesses discover, unlock, and manage IndiaMART buy-leads automatically — track machines, schedule auto-scrape, and export leads in one dashboard.">
+    <link rel="icon" type="image/png" href="/images/favicon-32.png">
+    <link rel="apple-touch-icon" href="/images/favicon-180.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/main.css">
     <script src="/js/theme.js"></script>
     <style>
-        .landing-container {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: var(--spacing-lg);
-            position: relative;
+        /* ---------- Navbar ---------- */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 300;
+            background: hsla(258, 45%, 8%, 0.72);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid hsla(255, 40%, 100%, 0.08);
         }
- 
-        .landing-hero h1 {
+
+        :root[data-theme="dark"] .navbar { background: hsla(258, 32%, 6%, 0.85); }
+
+        .navbar-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0.9rem 1.5rem;
             display: flex;
             align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+        }
+
+        .navbar-brand-mark {
+            display: inline-flex;
+            align-items: center;
             justify-content: center;
-            gap: 0.5rem;
-            font-size: 4rem;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            width: 2.1rem;
+            height: 2.1rem;
+            border-radius: 0.6rem;
+            background: linear-gradient(135deg, hsl(258, 90%, 66%), hsl(270, 91%, 65%));
+            color: white;
+        }
+
+        .navbar-brand-text strong {
+            display: block;
+            color: white;
+            font-weight: 800;
+            font-size: 0.95rem;
+            letter-spacing: -0.01em;
+        }
+
+        .navbar-brand-text span {
+            display: block;
+            color: hsla(255, 30%, 100%, 0.55);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .navbar-links {
+            display: none;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .navbar-links a {
+            color: hsla(255, 30%, 100%, 0.75);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 500;
+            transition: color var(--transition-fast);
+        }
+
+        .navbar-links a:hover { color: white; }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .navbar-actions .btn-secondary {
+            background: transparent;
+            border-color: hsla(255, 30%, 100%, 0.2);
+            color: white;
+        }
+
+        .navbar-actions .btn-secondary:hover {
+            background: hsla(255, 30%, 100%, 0.1);
+            border-color: hsla(255, 30%, 100%, 0.35);
+        }
+
+        .navbar-menu-btn {
+            display: inline-flex;
+            background: transparent;
+            border: 1px solid hsla(255, 30%, 100%, 0.2);
+            color: white;
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: var(--radius-sm);
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .navbar-mobile {
+            display: none;
+            flex-direction: column;
+            gap: 0.25rem;
+            padding: 0.5rem 1.5rem 1.25rem;
+            border-top: 1px solid hsla(255, 40%, 100%, 0.08);
+        }
+
+        .navbar-mobile.open { display: flex; }
+
+        .navbar-mobile a {
+            color: hsla(255, 30%, 100%, 0.8);
+            text-decoration: none;
+            padding: 0.6rem 0;
+            font-size: 0.92rem;
+            font-weight: 500;
+            border-bottom: 1px solid hsla(255, 40%, 100%, 0.06);
+        }
+
+        @media (min-width: 900px) {
+            .navbar-links { display: flex; }
+            .navbar-menu-btn { display: none; }
+        }
+
+        /* ---------- Hero ---------- */
+        .hero {
+            position: relative;
+            background: radial-gradient(ellipse 120% 90% at 20% -10%, hsl(262, 55%, 22%) 0%, hsl(258, 45%, 10%) 45%, hsl(262, 48%, 7%) 100%);
+            color: white;
+            overflow: hidden;
+            padding: 4.5rem 1.5rem 6rem;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 85% 15%, hsla(270, 91%, 65%, 0.25) 0%, transparent 45%),
+                radial-gradient(circle at 100% 60%, hsla(258, 90%, 66%, 0.18) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        .hero-inner {
+            position: relative;
+            max-width: 1280px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: hsla(255, 40%, 100%, 0.08);
+            border: 1px solid hsla(255, 40%, 100%, 0.15);
+            padding: 0.4rem 0.9rem;
+            border-radius: var(--radius-full);
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: hsl(258, 92%, 82%);
+            margin-bottom: 1.25rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.1rem, 5vw, 3.4rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.08;
+            margin-bottom: 1.1rem;
+        }
+
+        .hero h1 .grad {
+            background: linear-gradient(135deg, hsl(258, 95%, 78%) 0%, hsl(280, 90%, 75%) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: var(--spacing-md);
-            animation: slideDown 0.8s ease;
         }
 
-        .landing-hero h1 .icon {
-            width: 3rem;
-            height: 3rem;
-            color: var(--primary);
+        .hero p.lead {
+            font-size: 1.08rem;
+            color: hsla(255, 30%, 100%, 0.72);
+            max-width: 34rem;
+            margin-bottom: 1.75rem;
         }
 
-        .landing-hero p {
-            font-size: 1.5rem;
-            color: var(--text-secondary);
-            margin-bottom: var(--spacing-xl);
-            animation: slideUp 0.8s ease;
-        }
-
-        .cta-buttons {
+        .hero-cta {
             display: flex;
-            gap: var(--spacing-md);
-            animation: fadeIn 1s ease;
+            flex-wrap: wrap;
+            gap: 0.85rem;
+            margin-bottom: 2.25rem;
         }
 
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .hero-cta .btn {
+            padding: 0.85rem 1.6rem;
+            font-size: 0.95rem;
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .hero-cta .btn-secondary {
+            background: hsla(255, 30%, 100%, 0.08);
+            border: 1px solid hsla(255, 30%, 100%, 0.18);
+            color: white;
         }
 
-        @media (max-width: 768px) {
-            .landing-hero h1 {
-                font-size: 2.5rem;
-            }
+        .hero-cta .btn-secondary:hover {
+            background: hsla(255, 30%, 100%, 0.14);
+        }
 
-            .landing-hero p {
-                font-size: 1.2rem;
-            }
+        .hero-trust {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.82rem;
+            color: hsla(255, 30%, 100%, 0.55);
+        }
 
-            .cta-buttons {
-                flex-direction: column;
-                width: 100%;
-            }
+        .hero-trust .icon { color: hsl(160, 70%, 55%); }
 
-            .btn {
-                width: 100%;
-            }
+        /* Dashboard preview mockup — pure CSS/SVG, no external images */
+        .hero-preview-wrap {
+            position: relative;
+        }
+
+        .preview-window {
+            background: var(--bg-secondary);
+            border-radius: 1rem;
+            box-shadow: 0 30px 80px rgba(10, 5, 25, 0.55);
+            overflow: hidden;
+            border: 1px solid hsla(255, 30%, 100%, 0.1);
+            transform: perspective(1400px) rotateX(2deg);
+        }
+
+        .preview-chrome {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.7rem 0.9rem;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .preview-chrome span {
+            width: 0.55rem;
+            height: 0.55rem;
+            border-radius: 50%;
+            background: var(--border);
+        }
+
+        .preview-body {
+            display: flex;
+            min-height: 320px;
+        }
+
+        .preview-sidebar {
+            width: 30%;
+            background: linear-gradient(180deg, hsl(260, 48%, 11%), hsl(266, 55%, 7%));
+            padding: 1rem 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .preview-sidebar .p-line {
+            height: 0.5rem;
+            border-radius: var(--radius-full);
+            background: hsla(255, 40%, 100%, 0.14);
+        }
+
+        .preview-sidebar .p-line.active {
+            background: hsl(258, 90%, 66%);
+        }
+
+        .preview-main {
+            flex: 1;
+            padding: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .preview-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.6rem;
+        }
+
+        .preview-stat {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 0.6rem;
+            padding: 0.6rem;
+        }
+
+        .preview-stat .p-label {
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.3rem;
+        }
+
+        .preview-stat .p-value {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .preview-chart {
+            flex: 1;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 0.6rem;
+            padding: 0.75rem;
+        }
+
+        .preview-badge {
+            position: absolute;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            padding: 0.7rem 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .preview-badge-1 { top: -1rem; right: -1rem; }
+        .preview-badge-2 { bottom: -1rem; left: -1rem; }
+
+        .preview-badge .icon-wrap {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background: hsla(160, 84%, 33%, 0.14);
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (min-width: 980px) {
+            .hero-inner { grid-template-columns: 1.05fr 0.95fr; }
+        }
+
+        /* ---------- Trust strip ---------- */
+        .trust-strip {
+            padding: 2rem 1.5rem;
+            text-align: center;
+        }
+
+        .trust-strip p {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 1.1rem;
+        }
+
+        .trust-logos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2.5rem;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        /* ---------- Generic sections ---------- */
+        .lp-section {
+            padding: 4.5rem 1.5rem;
+        }
+
+        .lp-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .lp-header {
+            max-width: 40rem;
+            margin: 0 auto 3rem;
+            text-align: center;
+        }
+
+        .lp-eyebrow {
+            display: inline-block;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.75rem;
+        }
+
+        .lp-header h2 {
+            font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+            margin-bottom: 0.75rem;
+        }
+
+        .lp-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .feature-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.6rem;
+            box-shadow: var(--shadow);
+        }
+
+        .feature-icon {
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: var(--radius-sm);
+            background: var(--secondary);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* How it works / workflow */
+        .steps-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            counter-reset: step;
+        }
+
+        .step-card {
+            position: relative;
+            padding-top: 0.5rem;
+        }
+
+        .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.4rem;
+            height: 2.4rem;
+            border-radius: var(--radius-full);
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            font-weight: 800;
+            margin-bottom: 0.9rem;
+        }
+
+        .step-card h3 {
+            font-size: 0.98rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .step-card p {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+        }
+
+        /* Split feature rows (automation / machines / leads / csv) */
+        .split-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
+            align-items: center;
+            margin-bottom: 5rem;
+        }
+
+        .split-row:last-child { margin-bottom: 0; }
+
+        .split-row.reverse .split-visual { order: -1; }
+
+        .split-copy .lp-eyebrow { margin-bottom: 0.6rem; }
+
+        .split-copy h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .split-copy p {
+            color: var(--text-secondary);
+            margin-bottom: 1.25rem;
+        }
+
+        .split-copy ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .split-copy ul li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .split-copy ul li .icon {
+            color: var(--success);
+            margin-top: 0.2rem;
+            flex-shrink: 0;
+        }
+
+        .split-visual {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: 1.5rem;
+            min-height: 260px;
+        }
+
+        @media (min-width: 900px) {
+            .split-row { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* Mock UI fragments inside split-visual */
+        .mock-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.7rem 0.85rem;
+            border-radius: var(--radius-sm);
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            margin-bottom: 0.55rem;
+        }
+
+        .mock-row:last-child { margin-bottom: 0; }
+
+        .mock-row .mock-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Pricing */
+        .pricing-toggle-note {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 2rem;
+        }
+
+        .lp-pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* FAQ */
+        .faq-list {
+            max-width: 44rem;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .faq-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .faq-question {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1.1rem 1.35rem;
+            background: transparent;
+            border: none;
+            text-align: left;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .faq-question .icon {
+            color: var(--text-muted);
+            transition: transform var(--transition-fast);
+            flex-shrink: 0;
+        }
+
+        .faq-item.open .faq-question .icon {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height var(--transition-base);
+        }
+
+        .faq-item.open .faq-answer {
+            max-height: 16rem;
+        }
+
+        .faq-answer p {
+            padding: 0 1.35rem 1.1rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Final CTA */
+        .final-cta {
+            margin: 0 1.5rem 4.5rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            background: radial-gradient(ellipse 100% 100% at 20% 0%, hsl(262, 55%, 24%) 0%, hsl(258, 45%, 12%) 60%, hsl(262, 48%, 8%) 100%);
+            border-radius: var(--radius-lg);
+            padding: 3.5rem 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .final-cta h2 {
+            font-size: clamp(1.6rem, 3vw, 2.1rem);
+            margin-bottom: 0.75rem;
+        }
+
+        .final-cta p {
+            color: hsla(255, 30%, 100%, 0.72);
+            max-width: 30rem;
+            margin: 0 auto 1.75rem;
+        }
+
+        .final-cta .hero-cta { justify-content: center; }
+
+        /* Footer */
+        .site-footer {
+            border-top: 1px solid var(--border);
+            padding: 3rem 1.5rem 2rem;
+        }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-brand strong { font-weight: 800; }
+
+        .footer-cols {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .footer-col h4 {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            margin-bottom: 0.85rem;
+        }
+
+        .footer-col a {
+            display: block;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.88rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .footer-col a:hover { color: var(--primary); }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        @media (min-width: 780px) {
+            .footer-inner { grid-template-columns: 1.2fr 2fr; }
         }
     </style>
 </head>
+
 <body>
-    <div class="landing-container">
-        <button id="themeToggle" class="theme-toggle" style="position: absolute; top: var(--spacing-lg); right: var(--spacing-lg);" aria-label="Toggle theme">
-            <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-            <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
-        <div class="landing-hero">
-            <h1><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Lead Generator Pro</h1>
-            <p>Enterprise-level lead generation for IndiaMART</p>
-            <div class="cta-buttons">
-                <a href="/auth.html" class="btn btn-primary">Get Started</a>
-                <a href="/auth.html" class="btn btn-secondary">Login</a>
+    <!-- Navbar -->
+    <nav class="navbar" id="siteNavbar">
+        <div class="navbar-inner">
+            <a href="/" class="navbar-brand">
+                <img src="/images/nexlead-logo-dark.png" alt="NexLead" class="brand-logo-img brand-logo-lg">
+            </a>
+            <div class="navbar-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#faq">FAQ</a>
+            </div>
+            <div class="navbar-actions">
+                <a href="/auth.html" class="btn btn-secondary btn-sm">Login</a>
+                <a href="/auth.html?tab=register" class="btn btn-primary btn-sm">Get Started</a>
+                <button class="navbar-menu-btn" id="navMenuBtn" aria-label="Toggle menu" aria-expanded="false">
+                    <span id="navMenuIcon"></span>
+                </button>
             </div>
         </div>
-    </div>
+        <div class="navbar-mobile" id="navMobileMenu">
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#faq">FAQ</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="hero">
+        <div class="hero-inner">
+            <div>
+                <span class="hero-eyebrow"><span id="heroEyebrowIcon"></span> Built for IndiaMART sellers</span>
+                <h1>Find. Connect. <span class="grad">Grow.</span><br>Automate your IndiaMART lead generation.</h1>
+                <p class="lead">NexLead connects to your IndiaMART seller account, tracks the machines/products you sell, and automatically pulls and unlocks matching buy-leads on a schedule — all from one dashboard.</p>
+                <div class="hero-cta">
+                    <a href="/auth.html?tab=register" class="btn btn-primary">Get Started Free</a>
+                    <a href="#how-it-works" class="btn btn-secondary">View Demo</a>
+                </div>
+                <div class="hero-trust"><span id="heroTrustIcon"></span> No credit card required · Free tier includes 5 machines</div>
+            </div>
+            <div class="hero-preview-wrap">
+                <div class="preview-window">
+                    <div class="preview-chrome"><span></span><span></span><span></span></div>
+                    <div class="preview-body">
+                        <div class="preview-sidebar">
+                            <div class="p-line active" style="width:70%"></div>
+                            <div class="p-line" style="width:55%"></div>
+                            <div class="p-line" style="width:60%"></div>
+                            <div class="p-line" style="width:45%"></div>
+                            <div class="p-line" style="width:50%"></div>
+                        </div>
+                        <div class="preview-main">
+                            <div class="preview-stats">
+                                <div class="preview-stat"><div class="p-label">Machines</div><div class="p-value">Active</div></div>
+                                <div class="preview-stat"><div class="p-label">Leads</div><div class="p-value">IndiaMART</div></div>
+                                <div class="preview-stat"><div class="p-label">Auto-Scrape</div><div class="p-value">Live</div></div>
+                            </div>
+                            <div class="preview-chart">
+                                <svg viewBox="0 0 260 90" style="width:100%;height:100%;" preserveAspectRatio="none">
+                                    <polyline points="0,70 30,55 60,60 90,35 120,45 150,20 180,30 210,15 240,25 260,10" fill="none" stroke="url(#pgrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <defs>
+                                        <linearGradient id="pgrad" x1="0" y1="0" x2="1" y2="0">
+                                            <stop offset="0%" stop-color="#7c5cfa"/>
+                                            <stop offset="100%" stop-color="#a855f7"/>
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="preview-badge preview-badge-1"><span class="icon-wrap" id="previewBadgeIcon1"></span> Leads unlocked</div>
+                <div class="preview-badge preview-badge-2"><span class="icon-wrap" id="previewBadgeIcon2"></span> Auto-scrape running</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Trust strip -->
+    <section class="trust-strip">
+        <p>Built to work with your IndiaMART seller workflow</p>
+        <div class="trust-logos">
+            <span>IndiaMART</span>
+            <span>Razorpay</span>
+            <span>CSV / Excel</span>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="lp-section" id="features">
+        <div class="lp-inner">
+            <div class="lp-header">
+                <span class="lp-eyebrow">Platform</span>
+                <h2>Everything you need to turn IndiaMART traffic into leads</h2>
+                <p>One dashboard for connecting IndiaMART, tracking machines, and automating buy-lead unlocks.</p>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon" data-icon="link"></div>
+                    <h3>IndiaMART connection</h3>
+                    <p>Securely connect your seller.indiamart.com session with a one-click bookmarklet — no password sharing required.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" data-icon="zap"></div>
+                    <h3>Auto-scrape scheduling</h3>
+                    <p>Set an interval and an unlock limit — NexLead pulls fresh buy-leads in the background and stops when you say so.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" data-icon="upload-cloud"></div>
+                    <h3>CSV bulk import</h3>
+                    <p>Import your full machine/product list in seconds with drag-and-drop CSV upload, with clear duplicate handling.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" data-icon="cpu"></div>
+                    <h3>Machine management</h3>
+                    <p>Track every machine you sell, activate or pause them individually or in bulk, and search instantly.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" data-icon="bar-chart"></div>
+                    <h3>Lead management</h3>
+                    <p>Browse unlocked buyer contacts — company, email, mobile, location — in a clean, searchable table.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" data-icon="download"></div>
+                    <h3>One-click CSV export</h3>
+                    <p>Export your unlocked leads to CSV any time, ready for your CRM or outreach spreadsheet.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="lp-section" id="how-it-works" style="background:var(--bg-tertiary);">
+        <div class="lp-inner">
+            <div class="lp-header">
+                <span class="lp-eyebrow">How it works</span>
+                <h2>From signup to unlocked leads in four steps</h2>
+            </div>
+            <div class="steps-row">
+                <div class="step-card">
+                    <div class="step-num">1</div>
+                    <h3>Create your account</h3>
+                    <p>Register free — no credit card needed — and add the machines/products you sell.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">2</div>
+                    <h3>Connect IndiaMART</h3>
+                    <p>Use the one-click bookmarklet to securely link your seller.indiamart.com session.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">3</div>
+                    <h3>Scrape or automate</h3>
+                    <p>Pull leads on demand, or turn on auto-scrape to unlock new buy-leads on a schedule.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">4</div>
+                    <h3>Manage &amp; export</h3>
+                    <p>Review unlocked leads in your dashboard and export to CSV whenever you need them.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Workflow split sections -->
+    <section class="lp-section">
+        <div class="lp-inner">
+            <div class="split-row">
+                <div class="split-copy">
+                    <span class="lp-eyebrow">Automation</span>
+                    <h3>Let auto-scrape do the unlocking for you</h3>
+                    <p>Configure a run interval and a per-run unlock limit once — NexLead keeps checking IndiaMART for new buy-leads and unlocks matches automatically, spending credits only when it finds a real match.</p>
+                    <ul>
+                        <li><span data-icon="check"></span> Runs every 5–120 minutes, your choice</li>
+                        <li><span data-icon="check"></span> Caps unlocks per run so you control spend</li>
+                        <li><span data-icon="check"></span> Start or stop instantly from the dashboard</li>
+                    </ul>
+                </div>
+                <div class="split-visual">
+                    <div class="mock-row"><span class="mock-name">Auto-scrape</span><span class="status-pill status-active">Running</span></div>
+                    <div class="mock-row"><span class="mock-name">Interval</span><span class="text-secondary" style="font-size:0.85rem;">Every 15 min</span></div>
+                    <div class="mock-row"><span class="mock-name">Unlock limit</span><span class="text-secondary" style="font-size:0.85rem;">2 per run</span></div>
+                    <div class="mock-row"><span class="mock-name">Last run</span><span class="text-secondary" style="font-size:0.85rem;">Moments ago</span></div>
+                </div>
+            </div>
+
+            <div class="split-row reverse">
+                <div class="split-copy">
+                    <span class="lp-eyebrow">Machine management</span>
+                    <h3>Every machine you sell, organized and searchable</h3>
+                    <p>Add machines one at a time or import your whole catalogue via CSV. Activate, pause, or bulk-manage them from tidy active/inactive tabs.</p>
+                    <ul>
+                        <li><span data-icon="check"></span> Active/inactive tabs with live counts</li>
+                        <li><span data-icon="check"></span> Bulk activate, deactivate, or delete</li>
+                        <li><span data-icon="check"></span> Instant name search</li>
+                    </ul>
+                </div>
+                <div class="split-visual">
+                    <div class="mock-row"><span class="mock-name">Laser Cutting Machine</span><span class="status-pill status-active">Active</span></div>
+                    <div class="mock-row"><span class="mock-name">CNC Machine</span><span class="status-pill status-active">Active</span></div>
+                    <div class="mock-row"><span class="mock-name">Lathe Machine</span><span class="status-pill status-paused">Paused</span></div>
+                    <div class="mock-row"><span class="mock-name">Welding Machine</span><span class="status-pill status-active">Active</span></div>
+                </div>
+            </div>
+
+            <div class="split-row">
+                <div class="split-copy">
+                    <span class="lp-eyebrow">Lead management</span>
+                    <h3>Buyer details, unlocked and organized</h3>
+                    <p>Every unlocked lead shows the buyer's company, contact, and location alongside the product they inquired about — ready to follow up on.</p>
+                    <ul>
+                        <li><span data-icon="check"></span> Company, email, mobile &amp; location in one row</li>
+                        <li><span data-icon="check"></span> Locked leads stay clearly marked until unlocked</li>
+                        <li><span data-icon="check"></span> Search and sort instantly</li>
+                    </ul>
+                </div>
+                <div class="split-visual">
+                    <div class="mock-row"><span class="mock-name">Shree Ganesh Industries</span><span class="text-secondary" style="font-size:0.8rem;">Jaipur, Rajasthan</span></div>
+                    <div class="mock-row"><span class="mock-name">Perfect Tools</span><span class="text-secondary" style="font-size:0.8rem;">Ludhiana, Punjab</span></div>
+                    <div class="mock-row"><span class="mock-name">Kundan Engineering</span><span class="text-secondary" style="font-size:0.8rem;">Ahmedabad, Gujarat</span></div>
+                </div>
+            </div>
+
+            <div class="split-row reverse">
+                <div class="split-copy">
+                    <span class="lp-eyebrow">CSV import &amp; export</span>
+                    <h3>Bring your list in, take your leads out</h3>
+                    <p>Bulk-import your machine catalogue from a CSV file with clear duplicate handling, and export unlocked leads to CSV any time for your CRM or spreadsheet.</p>
+                    <ul>
+                        <li><span data-icon="check"></span> Drag-and-drop CSV upload</li>
+                        <li><span data-icon="check"></span> Duplicate names are skipped, not double-added</li>
+                        <li><span data-icon="check"></span> One-click leads export</li>
+                    </ul>
+                </div>
+                <div class="split-visual" style="display:flex;align-items:center;justify-content:center;">
+                    <div style="text-align:center;">
+                        <div style="width:3.5rem;height:3.5rem;margin:0 auto 1rem;border-radius:9999px;background:var(--secondary);color:var(--primary);display:flex;align-items:center;justify-content:center;" data-icon-lg="upload-cloud"></div>
+                        <p class="text-secondary" style="font-size:0.9rem;">Drop a .csv file to import machines</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="lp-section" id="pricing" style="background:var(--bg-tertiary);">
+        <div class="lp-inner">
+            <div class="lp-header">
+                <span class="lp-eyebrow">Pricing</span>
+                <h2>Simple, transparent pricing</h2>
+                <p>Start free. Upgrade when you need unlimited machines.</p>
+            </div>
+            <div class="lp-pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-name">Free</div>
+                    <div class="pricing-price">₹0<span>/month</span></div>
+                    <p class="text-secondary" style="font-size:0.85rem;">Everything you need to get started.</p>
+                    <ul class="pricing-features">
+                        <li><span data-icon="check-circle"></span> Up to 5 machines</li>
+                        <li><span data-icon="check-circle"></span> IndiaMART connection</li>
+                        <li><span data-icon="check-circle"></span> Manual &amp; auto-scrape</li>
+                        <li><span data-icon="check-circle"></span> CSV import &amp; export</li>
+                    </ul>
+                    <a href="/auth.html?tab=register" class="btn btn-secondary" style="width:100%;">Get Started Free</a>
+                </div>
+                <div class="pricing-card popular">
+                    <div class="pricing-badge">Most Popular</div>
+                    <div class="pricing-name">Pro</div>
+                    <div class="pricing-price">₹50<span>/month</span></div>
+                    <p class="text-secondary" style="font-size:0.85rem;">For sellers scaling past 5 machines.</p>
+                    <ul class="pricing-features">
+                        <li><span data-icon="check-circle"></span> Unlimited machines</li>
+                        <li><span data-icon="check-circle"></span> IndiaMART connection</li>
+                        <li><span data-icon="check-circle"></span> Manual &amp; auto-scrape</li>
+                        <li><span data-icon="check-circle"></span> CSV import &amp; export</li>
+                        <li><span data-icon="check-circle"></span> Priority processing</li>
+                    </ul>
+                    <a href="/auth.html?tab=register" class="btn btn-primary" style="width:100%;">Upgrade to Pro</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="lp-section" id="faq">
+        <div class="lp-inner">
+            <div class="lp-header">
+                <span class="lp-eyebrow">FAQ</span>
+                <h2>Frequently asked questions</h2>
+            </div>
+            <div class="faq-list" id="faqList">
+                <div class="faq-item">
+                    <button class="faq-question">Do I need to share my IndiaMART password?<span data-icon="chevron-down"></span></button>
+                    <div class="faq-answer"><p>No. Connecting only reads the session already active in your browser after you log in to seller.indiamart.com normally — your password is never entered into NexLead.</p></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">What happens when auto-scrape unlocks a lead?<span data-icon="chevron-down"></span></button>
+                    <div class="faq-answer"><p>Each unlock spends real IndiaMART credits from your seller account, up to the per-run limit you set. You stay in control of the interval and the limit at all times.</p></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">How many machines can I track on the Free plan?<span data-icon="chevron-down"></span></button>
+                    <div class="faq-answer"><p>Up to 5 machines. Upgrading to Pro (₹50/month) removes that limit entirely.</p></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Can I import my machine list in bulk?<span data-icon="chevron-down"></span></button>
+                    <div class="faq-answer"><p>Yes — upload a CSV of machine names from the CSV Upload page and NexLead will skip duplicates automatically.</p></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Can I cancel or downgrade at any time?<span data-icon="chevron-down"></span></button>
+                    <div class="faq-answer"><p>Yes, there's no lock-in — manage your plan any time from the Payments page in your dashboard.</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="final-cta">
+        <h2>Start generating IndiaMART leads on autopilot</h2>
+        <p>Free to start — connect your IndiaMART account and add your first machine in minutes.</p>
+        <div class="hero-cta">
+            <a href="/auth.html?tab=register" class="btn btn-primary">Get Started Free</a>
+            <a href="/auth.html" class="btn btn-secondary">Login</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div>
+                <div class="footer-brand">
+                    <span class="brand-logo-swap">
+                        <img src="/images/nexlead-logo.png" alt="NexLead" class="brand-logo-img brand-logo-light">
+                        <img src="/images/nexlead-logo-dark.png" alt="NexLead" class="brand-logo-img brand-logo-dark">
+                    </span>
+                </div>
+                <p class="text-secondary" style="font-size:0.88rem;max-width:22rem;">Automated IndiaMART lead generation for sellers who'd rather sell than search.</p>
+            </div>
+            <div class="footer-cols">
+                <div class="footer-col">
+                    <h4>Product</h4>
+                    <a href="#features">Features</a>
+                    <a href="#how-it-works">How It Works</a>
+                    <a href="#pricing">Pricing</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Account</h4>
+                    <a href="/auth.html">Login</a>
+                    <a href="/auth.html?tab=register">Get Started</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Support</h4>
+                    <a href="/help.html">Help Center</a>
+                    <a href="#faq">FAQ</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; <span id="footerYear"></span> NexLead. All rights reserved.</span>
+            <a href="https://syncnowise.com" target="_blank" rel="noopener noreferrer" class="made-by-credit">Powered by <span class="brand-logo-chip"><img src="/images/syncnowise-logo.png" alt="SyncNowise" class="brand-logo-img"></span></a>
+            <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+                <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+        </div>
+    </footer>
+
+    <script src="/js/icons.js"></script>
+    <script>
+        // Populate icon slots from the shared ICONS map (keeps path data in one place).
+        document.getElementById('navMenuIcon').innerHTML = svgIcon('menu');
+        document.getElementById('heroEyebrowIcon').innerHTML = svgIcon('zap');
+        document.getElementById('heroTrustIcon').innerHTML = svgIcon('check-circle');
+        document.getElementById('previewBadgeIcon1').innerHTML = svgIcon('check-circle');
+        document.getElementById('previewBadgeIcon2').innerHTML = svgIcon('play');
+        document.querySelectorAll('[data-icon]').forEach((el) => { el.innerHTML = svgIcon(el.dataset.icon); });
+        document.querySelectorAll('[data-icon-lg]').forEach((el) => { el.innerHTML = svgIcon(el.dataset.iconLg, 'icon-lg'); });
+        document.getElementById('footerYear').textContent = new Date().getFullYear();
+
+        // Mobile nav toggle
+        const navMenuBtn = document.getElementById('navMenuBtn');
+        const navMobileMenu = document.getElementById('navMobileMenu');
+        navMenuBtn.addEventListener('click', () => {
+            const open = navMobileMenu.classList.toggle('open');
+            navMenuBtn.setAttribute('aria-expanded', String(open));
+        });
+        navMobileMenu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => {
+            navMobileMenu.classList.remove('open');
+            navMenuBtn.setAttribute('aria-expanded', 'false');
+        }));
+
+        // FAQ accordion
+        document.querySelectorAll('.faq-item').forEach((item) => {
+            item.querySelector('.faq-question').addEventListener('click', () => {
+                const wasOpen = item.classList.contains('open');
+                document.querySelectorAll('.faq-item.open').forEach((el) => el.classList.remove('open'));
+                if (!wasOpen) item.classList.add('open');
+            });
+        });
+
+        // If already logged in, skip the landing page and go straight to the dashboard.
+        if (localStorage.getItem('token')) {
+            window.location.href = '/dashboard.html';
+        }
+    </script>
 </body>
+
 </html>

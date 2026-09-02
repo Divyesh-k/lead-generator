@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IndiaMART Leads — NexLead</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/app-shell.css">
+    <link rel="icon" type="image/png" href="/images/favicon-32.png">
+    <link rel="apple-touch-icon" href="/images/favicon-180.png">
+    <script src="/js/theme.js"></script>
+    <style>
+        .leads-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .leads-count-badge {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+
+        .leads-count-badge strong {
+            color: var(--text-primary);
+        }
+
+        th.sortable {
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        th.sortable .icon {
+            width: 0.85em;
+            height: 0.85em;
+            margin-left: 0.2em;
+            opacity: 0.5;
+            vertical-align: -0.1em;
+        }
+
+        th.sortable.active .icon {
+            opacity: 1;
+            color: var(--primary);
+        }
+
+        .lead-locked {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .lead-locked .icon {
+            width: 0.9em;
+            height: 0.9em;
+        }
+    </style>
+</head>
+<body data-page="leads" data-title="IndiaMART Leads" data-desc="Buyer leads scraped from your connected IndiaMART account">
+    <div class="app-shell">
+        <main class="app-main" id="appMain">
+            <div class="app-content" id="appContent">
+                <div class="section">
+                    <div class="leads-toolbar">
+                        <div class="search-bar">
+                            <span id="searchIcon"></span>
+                            <input type="text" class="input" id="leadSearchInput" placeholder="Search by product, company or city…">
+                        </div>
+                        <div class="section-actions">
+                            <span class="leads-count-badge" id="leadsCountBadge"></span>
+                            <button type="button" class="btn btn-secondary btn-sm" id="exportLeadsBtn">
+                                <span id="exportIcon"></span>Export CSV
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="leadsLoading" class="table-container" style="padding: 1.25rem; display:flex; flex-direction:column; gap:0.6rem;">
+                        <div class="skeleton" style="height:2.75rem;"></div>
+                        <div class="skeleton" style="height:2.75rem;"></div>
+                        <div class="skeleton" style="height:2.75rem;"></div>
+                        <div class="skeleton" style="height:2.75rem;"></div>
+                        <div class="skeleton" style="height:2.75rem;"></div>
+                    </div>
+
+                    <div class="table-container hidden" id="leadsTableWrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="sortable" data-sort="title">Product</th>
+                                    <th class="sortable" data-sort="buyerName">Buyer Name</th>
+                                    <th>Email</th>
+                                    <th>Mobile</th>
+                                    <th class="sortable" data-sort="buyerCity">City / State</th>
+                                    <th class="sortable" data-sort="buyerCompany">Company</th>
+                                    <th>Member Since</th>
+                                    <th>Credits Spent</th>
+                                    <th class="sortable" data-sort="scrapedAt">Scraped At</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leadsTableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="empty-state hidden" id="leadsEmptyState">
+                        <div class="empty-icon" id="leadsEmptyIcon"></div>
+                        <h3>No IndiaMART leads scraped yet</h3>
+                        <p>Connect your IndiaMART account and run a scrape to start pulling buyer leads here.</p>
+                        <a href="/auto-scrape.html" class="btn btn-primary btn-sm">Connect / scrape now</a>
+                    </div>
+
+                    <div class="empty-state hidden" id="leadsNoResultsState">
+                        <div class="empty-icon" id="leadsNoResultsIcon"></div>
+                        <h3>No leads match your search</h3>
+                        <p>Try a different product, company or city.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="/js/icons.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/app-shell.js"></script>
+    <script src="/js/leads.js"></script>
+</body>
+</html>

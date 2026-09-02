@@ -7,8 +7,10 @@
     <title>Connect IndiaMART</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/main.css">
+    <link rel="icon" type="image/png" href="/images/favicon-32.png">
+    <link rel="apple-touch-icon" href="/images/favicon-180.png">
     <script src="/js/theme.js"></script>
     <style>
         .connect-page {
@@ -21,9 +23,10 @@
         .connect-header h1 {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 1.75rem;
+            gap: 0.6rem;
+            font-size: 1.85rem;
             margin-bottom: var(--spacing-xs);
+            letter-spacing: -0.02em;
         }
 
         .connect-header h1 .icon, .connect-card h2 .icon {
@@ -37,6 +40,7 @@
 
         .connect-card {
             padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
         }
 
         .connect-card h2 {
@@ -64,7 +68,7 @@
             width: 28px;
             height: 28px;
             border-radius: var(--radius-full);
-            background: var(--secondary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
             color: white;
             display: flex;
             align-items: center;
@@ -83,12 +87,13 @@
             gap: 0.4rem;
             background: var(--success);
             color: white;
-            padding: 0.6rem 1.1rem;
+            padding: 0.65rem 1.2rem;
             border-radius: var(--radius-sm);
             font-weight: 600;
             text-decoration: none;
             cursor: grab;
             margin-top: 0.5rem;
+            box-shadow: var(--shadow);
         }
 
         .connect-footnote {
@@ -107,17 +112,17 @@
         }
 
         #connectStatus.connected {
-            background: hsla(142, 71%, 45%, 0.15);
+            background: hsla(160, 84%, 33%, 0.12);
             color: var(--success);
         }
 
         #connectStatus.waiting {
-            background: hsla(38, 92%, 50%, 0.12);
+            background: hsla(38, 92%, 45%, 0.12);
             color: var(--warning);
         }
 
         #connectStatus.error {
-            background: hsla(0, 84%, 60%, 0.12);
+            background: hsla(0, 72%, 51%, 0.1);
             color: var(--error);
         }
 

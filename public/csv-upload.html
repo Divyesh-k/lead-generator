@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Upload — NexLead</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/app-shell.css">
+    <link rel="icon" type="image/png" href="/images/favicon-32.png">
+    <link rel="apple-touch-icon" href="/images/favicon-180.png">
+    <script src="/js/theme.js"></script>
+    <style>
+        .upload-card {
+            max-width: 640px;
+        }
+
+        .upload-dropzone {
+            position: relative;
+        }
+
+        .upload-dropzone p.upload-title {
+            font-weight: 600;
+            font-size: 0.98rem;
+            color: var(--text-primary);
+            margin-bottom: 0.3rem;
+        }
+
+        .upload-dropzone p.upload-hint {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            max-width: 28rem;
+            margin: 0 auto;
+        }
+
+        .upload-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .upload-state-icon {
+            width: 3.5rem;
+            height: 3.5rem;
+            margin: 0 auto 1rem;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-state-icon.success {
+            background: hsla(160, 84%, 33%, 0.12);
+            color: var(--success);
+        }
+
+        .upload-state-icon.error {
+            background: hsla(0, 72%, 51%, 0.1);
+            color: var(--error);
+        }
+
+        .upload-state-icon .icon {
+            width: 1.75rem;
+            height: 1.75rem;
+        }
+
+        .upload-progress-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.9rem;
+        }
+
+        .upload-progress-track {
+            max-width: 280px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .upload-result-message {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .upload-error-message {
+            font-size: 0.88rem;
+            color: var(--error);
+            margin-top: 0.25rem;
+            max-width: 30rem;
+        }
+
+        .upload-limit-note {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        .upload-actions {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 1.25rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .format-tips {
+            margin-top: 1.25rem;
+        }
+
+        .format-tips h3 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .format-tips ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .format-tips li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            font-size: 0.83rem;
+            color: var(--text-secondary);
+        }
+
+        .format-tips li .icon {
+            color: var(--primary);
+            margin-top: 0.2rem;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body data-page="csv-upload" data-title="CSV Upload" data-desc="Bulk-import machine names from a CSV file">
+    <div class="app-shell">
+        <main class="app-main" id="appMain">
+            <div class="app-content" id="appContent">
+                <div class="section">
+                    <div class="section-header">
+                        <div>
+                            <h2>Upload machines from CSV</h2>
+                            <p class="section-subtitle">Drop a CSV file to bulk-add machine names to your account.</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-card upload-card">
+                        <div class="upload-dropzone" id="dropzone">
+                            <input type="file" id="csvFileInput" accept=".csv" hidden>
+
+                            <div class="upload-state" id="stateIdle">
+                                <div class="upload-icon-wrap" id="idleIconWrap"></div>
+                                <p class="upload-title">Drag &amp; drop a CSV file, or click to browse</p>
+                                <p class="upload-hint">Your file needs one machine name per row or column — a header like "name" or "machine" is picked up automatically, otherwise the first column is used.</p>
+                            </div>
+
+                            <div class="upload-state hidden" id="stateUploading">
+                                <div class="spinner" style="margin-bottom:1rem;"></div>
+                                <p class="upload-title">Uploading &amp; importing…</p>
+                                <div class="upload-progress-track">
+                                    <div class="upload-progress-fill" id="uploadProgressFill"></div>
+                                </div>
+                            </div>
+
+                            <div class="upload-state hidden" id="stateSuccess">
+                                <div class="upload-state-icon success" id="successIconWrap"></div>
+                                <p class="upload-title" id="successTitle">Machines imported</p>
+                                <p class="upload-result-message" id="successMessage"></p>
+                                <div class="upload-actions">
+                                    <button type="button" class="btn btn-secondary btn-sm" id="uploadAnotherBtn">Upload another file</button>
+                                    <a href="/machines.html" class="btn btn-primary btn-sm">View machines</a>
+                                </div>
+                            </div>
+
+                            <div class="upload-state hidden" id="stateError">
+                                <div class="upload-state-icon error" id="errorIconWrap"></div>
+                                <p class="upload-title" id="errorTitle">Upload failed</p>
+                                <p class="upload-error-message" id="errorMessage"></p>
+                                <p class="upload-limit-note hidden" id="upgradeNote">
+                                    <a href="/payments.html" id="upgradeLink">Upgrade to Pro</a> for unlimited machines.
+                                </p>
+                                <div class="upload-actions">
+                                    <button type="button" class="btn btn-primary btn-sm" id="tryAgainBtn">Try again</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="format-tips" id="formatTips">
+                            <h3>CSV format tips</h3>
+                            <ul>
+                                <li id="tipHeader"></li>
+                                <li id="tipComment"></li>
+                                <li id="tipDuplicate"></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="/js/icons.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/app-shell.js"></script>
+    <script src="/js/csv-upload.js"></script>
+</body>
+</html>

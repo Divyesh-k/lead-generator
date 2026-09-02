@@ -3,59 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lead Generator - Login</title>
+    <title>NexLead — Login</title>
+    <link rel="icon" type="image/png" href="/images/favicon-32.png">
+    <link rel="apple-touch-icon" href="/images/favicon-180.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/main.css">
     <script src="/js/theme.js"></script>
     <style>
-        .auth-container {
+        .auth-page {
             min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+
+        @media (min-width: 960px) {
+            .auth-page { grid-template-columns: 1.05fr 1fr; }
+        }
+
+        /* ---------- Left brand panel ---------- */
+        .auth-brand-panel {
+            display: none;
+            position: relative;
+            background: radial-gradient(ellipse 120% 90% at 20% -10%, hsl(262, 55%, 22%) 0%, hsl(258, 45%, 10%) 45%, hsl(262, 48%, 7%) 100%);
+            color: white;
+            padding: 3rem;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        .auth-brand-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle at 85% 15%, hsla(270, 91%, 65%, 0.25) 0%, transparent 45%);
+            pointer-events: none;
+        }
+
+        @media (min-width: 960px) {
+            .auth-brand-panel { display: flex; }
+        }
+
+        .auth-brand-top {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .auth-brand-mark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.1rem;
+            height: 2.1rem;
+            border-radius: 0.6rem;
+            background: linear-gradient(135deg, hsl(258, 90%, 66%), hsl(270, 91%, 65%));
+        }
+
+        .auth-brand-top strong {
+            font-weight: 800;
+            font-size: 0.95rem;
+        }
+
+        .auth-brand-top span {
+            display: block;
+            color: hsla(255, 30%, 100%, 0.55);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .auth-brand-mid {
+            position: relative;
+            max-width: 26rem;
+        }
+
+        .auth-brand-mid h2 {
+            font-size: 2rem;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.9rem;
+        }
+
+        .auth-brand-mid p {
+            color: hsla(255, 30%, 100%, 0.7);
+            font-size: 0.98rem;
+        }
+
+        .auth-brand-features {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .auth-brand-feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .auth-brand-feature .icon-wrap {
+            width: 2.1rem;
+            height: 2.1rem;
+            border-radius: var(--radius-sm);
+            background: hsla(255, 30%, 100%, 0.1);
+            color: hsl(258, 92%, 82%);
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: var(--spacing-md);
+            flex-shrink: 0;
+        }
+
+        .auth-brand-feature strong {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 0.15rem;
+        }
+
+        .auth-brand-feature span {
+            color: hsla(255, 30%, 100%, 0.6);
+            font-size: 0.82rem;
+        }
+
+        [data-mode="register"] .brand-content-login { display: none; }
+        [data-mode="login"] .brand-content-register,
+        .brand-content-register { display: none; }
+        [data-mode="register"] .brand-content-register { display: block; }
+        [data-mode="register"] .auth-brand-features.for-login { display: none; }
+        [data-mode="register"] .auth-brand-features.for-register { display: flex; }
+        .auth-brand-features.for-register { display: none; }
+
+        /* ---------- Right form panel ---------- */
+        .auth-form-panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.25rem;
             position: relative;
         }
 
+        .auth-form-panel .theme-toggle {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+        }
+
         .auth-card {
-            max-width: 450px;
+            max-width: 420px;
             width: 100%;
         }
 
+        .auth-card-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .auth-card-logo .navbar-brand-mark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.1rem;
+            height: 2.1rem;
+            border-radius: 0.6rem;
+            background: linear-gradient(135deg, hsl(258, 90%, 66%), hsl(270, 91%, 65%));
+            color: white;
+        }
+
+        .auth-card-logo strong {
+            display: block;
+            font-weight: 800;
+            font-size: 0.95rem;
+        }
+
         .auth-header {
-            text-align: center;
             margin-bottom: var(--spacing-lg);
         }
 
         .auth-header h1 {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            font-size: 2.5rem;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: var(--spacing-xs);
-        }
-
-        .auth-header h1 .icon {
-            width: 2rem;
-            height: 2rem;
-            color: var(--primary);
+            font-size: 1.7rem;
+            margin-bottom: 0.3rem;
         }
 
         .auth-header p {
             color: var(--text-secondary);
+            font-size: 0.92rem;
         }
 
         .auth-tabs {
             display: flex;
             gap: var(--spacing-sm);
             margin-bottom: var(--spacing-lg);
+            border-bottom: 1px solid var(--border);
         }
 
         .auth-tab {
@@ -63,12 +206,13 @@
             padding: 0.75rem;
             background: transparent;
             border: none;
-            border-bottom: 2px solid var(--border);
+            border-bottom: 2px solid transparent;
             color: var(--text-secondary);
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             transition: all var(--transition-base);
+            margin-bottom: -1px;
         }
 
         .auth-tab.active {
@@ -85,35 +229,92 @@
             animation: fadeIn var(--transition-base);
         }
 
+        .password-field {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            padding: 0.2rem;
+        }
+
+        .password-toggle:hover { color: var(--primary); }
+
+        .auth-row-between {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-md);
+            font-size: 0.85rem;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            color: var(--text-secondary);
+        }
+
+        .remember-me input { accent-color: var(--primary); }
+
+        .forgot-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .forgot-link:hover { text-decoration: underline; }
+
+        .terms-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .terms-row input { margin-top: 0.2rem; accent-color: var(--primary); }
+
         .error-message {
-            background: rgba(239, 68, 68, 0.1);
+            background: hsla(0, 72%, 51%, 0.1);
             border: 1px solid var(--error);
             color: var(--error);
-            padding: var(--spacing-sm);
-            border-radius: var(--radius-md);
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-sm);
             margin-bottom: var(--spacing-md);
             display: none;
+            font-size: 0.88rem;
         }
 
         .error-message.show {
             display: block;
-            animation: shake 0.5s;
+            animation: shake 0.4s;
         }
 
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
         }
 
         .success-message {
-            background: rgba(34, 197, 94, 0.1);
+            background: hsla(160, 84%, 33%, 0.1);
             border: 1px solid var(--success);
             color: var(--success);
-            padding: var(--spacing-sm);
-            border-radius: var(--radius-md);
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-sm);
             margin-bottom: var(--spacing-md);
             display: none;
+            font-size: 0.88rem;
         }
 
         .success-message.show {
@@ -121,99 +322,211 @@
             animation: fadeIn var(--transition-base);
         }
 
-        .divider {
+        .auth-footnote {
             text-align: center;
-            margin: var(--spacing-lg) 0;
-            color: var(--text-muted);
-            position: relative;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: var(--spacing-md);
         }
 
-        .divider::before,
-        .divider::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            width: 40%;
-            height: 1px;
-            background: var(--border);
+        .auth-footnote a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
         }
 
-        .divider::before { left: 0; }
-        .divider::after { right: 0; }
+        .auth-footnote a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-    <div class="auth-container">
-        <button id="themeToggle" class="theme-toggle" style="position: absolute; top: var(--spacing-lg); right: var(--spacing-lg);" aria-label="Toggle theme">
-            <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-            <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
-        <div class="auth-card glass-card">
-            <div class="auth-header">
-                <h1><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Lead Generator</h1>
-                <p>Enterprise Lead Generation Platform</p>
+    <div class="auth-page" id="authShell" data-mode="login">
+        <!-- Left brand panel -->
+        <div class="auth-brand-panel">
+            <div class="auth-brand-top">
+                <img src="/images/nexlead-logo-dark.png" alt="NexLead" class="brand-logo-img brand-logo-lg">
             </div>
 
-            <div class="auth-tabs">
-                <button class="auth-tab active" data-tab="login">Login</button>
-                <button class="auth-tab" data-tab="register">Register</button>
+            <div class="auth-brand-mid">
+                <div class="brand-content-login">
+                    <h2>Welcome back. Your leads are waiting.</h2>
+                    <p>Log in to check your IndiaMART auto-scrape status, review newly unlocked leads, and manage your machines.</p>
+                </div>
+                <div class="brand-content-register">
+                    <h2>Start generating leads in minutes.</h2>
+                    <p>Create your free account — no credit card required — and connect your IndiaMART seller account right away.</p>
+                </div>
             </div>
 
-            <div id="errorMessage" class="error-message"></div>
-            <div id="successMessage" class="success-message"></div>
+            <div class="auth-brand-features for-login">
+                <div class="auth-brand-feature">
+                    <span class="icon-wrap" data-icon="shield"></span>
+                    <span><strong>Secure &amp; reliable</strong><span>Your session data stays private to your account.</span></span>
+                </div>
+                <div class="auth-brand-feature">
+                    <span class="icon-wrap" data-icon="zap"></span>
+                    <span><strong>Lightning fast</strong><span>Auto-scrape unlocks leads for you, on schedule.</span></span>
+                </div>
+                <div class="auth-brand-feature">
+                    <span class="icon-wrap" data-icon="check-circle"></span>
+                    <span><strong>Accurate data</strong><span>Buyer details pulled straight from IndiaMART.</span></span>
+                </div>
+            </div>
 
-            <!-- Login Form -->
-            <form id="loginForm" class="auth-form active">
-                <div class="input-group">
-                    <label for="loginEmail">Email</label>
-                    <input type="email" id="loginEmail" class="input" placeholder="your@email.com" required>
+            <div class="auth-brand-features for-register">
+                <div class="auth-brand-feature">
+                    <span class="icon-wrap" data-icon="star"></span>
+                    <span><strong>7-day-friendly free tier</strong><span>Explore every core feature on the Free plan — no rush.</span></span>
+                </div>
+                <div class="auth-brand-feature">
+                    <span class="icon-wrap" data-icon="credit-card"></span>
+                    <span><strong>No credit card required</strong><span>Start free with up to 5 machines.</span></span>
+                </div>
+                <div class="auth-brand-feature">
+                    <span class="icon-wrap" data-icon="x"></span>
+                    <span><strong>Cancel anytime</strong><span>You're always in control of your plan.</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right form panel -->
+        <div class="auth-form-panel">
+            <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+                <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+
+            <div class="auth-card">
+                <a href="/" class="auth-card-logo">
+                    <span class="brand-logo-swap">
+                        <img src="/images/nexlead-logo.png" alt="NexLead" class="brand-logo-img brand-logo-light">
+                        <img src="/images/nexlead-logo-dark.png" alt="NexLead" class="brand-logo-img brand-logo-dark">
+                    </span>
+                </a>
+
+                <div class="auth-header">
+                    <h1 id="authHeading">Welcome back!</h1>
+                    <p id="authSubheading">Login to continue to your account</p>
                 </div>
 
-                <div class="input-group">
-                    <label for="loginPassword">Password</label>
-                    <input type="password" id="loginPassword" class="input" placeholder="••••••••" required>
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-tab="login">Login</button>
+                    <button class="auth-tab" data-tab="register">Register</button>
                 </div>
 
-                <button type="submit" class="btn btn-primary" style="width: 100%;">
-                    <span id="loginBtnText">Login</span>
-                    <div id="loginSpinner" class="spinner hidden" style="margin: 0 auto;"></div>
-                </button>
-            </form>
+                <div id="errorMessage" class="error-message"></div>
+                <div id="successMessage" class="success-message"></div>
 
-            <!-- Register Form -->
-            <form id="registerForm" class="auth-form">
-                <div class="input-group">
-                    <label for="registerName">Full Name</label>
-                    <input type="text" id="registerName" class="input" placeholder="John Doe" required>
-                </div>
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form active">
+                    <div class="input-group">
+                        <label for="loginEmail">Email Address</label>
+                        <input type="email" id="loginEmail" class="input" placeholder="you@example.com" required>
+                    </div>
 
-                <div class="input-group">
-                    <label for="registerEmail">Email</label>
-                    <input type="email" id="registerEmail" class="input" placeholder="your@email.com" required>
-                </div>
+                    <div class="input-group">
+                        <label for="loginPassword">Password</label>
+                        <div class="password-field">
+                            <input type="password" id="loginPassword" class="input" placeholder="••••••••" required>
+                            <button type="button" class="password-toggle" data-target="loginPassword" aria-label="Show password"><span data-icon="eye"></span></button>
+                        </div>
+                    </div>
 
-                <div class="input-group">
-                    <label for="registerPassword">Password</label>
-                    <input type="password" id="registerPassword" class="input" placeholder="••••••••" minlength="6" required>
-                </div>
+                    <div class="auth-row-between">
+                        <label class="remember-me">
+                            <input type="checkbox" checked>
+                            Remember me
+                        </label>
+                        <a href="mailto:support@laserleadgenerator.com" class="forgot-link">Forgot password?</a>
+                    </div>
 
-                <div class="input-group">
-                    <label for="registerPasswordConfirm">Confirm Password</label>
-                    <input type="password" id="registerPasswordConfirm" class="input" placeholder="••••••••" minlength="6" required>
-                </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <span id="loginBtnText">Login</span>
+                        <div id="loginSpinner" class="spinner hidden" style="width:20px;height:20px;border-width:2px;margin:0 auto;"></div>
+                    </button>
+                </form>
 
-                <button type="submit" class="btn btn-primary" style="width: 100%;">
-                    <span id="registerBtnText">Create Account</span>
-                    <div id="registerSpinner" class="spinner hidden" style="margin: 0 auto;"></div>
-                </button>
+                <!-- Register Form -->
+                <form id="registerForm" class="auth-form">
+                    <div class="input-group">
+                        <label for="registerName">Full Name</label>
+                        <input type="text" id="registerName" class="input" placeholder="John Doe" required>
+                    </div>
 
-                <p class="text-center text-secondary mt-3" style="font-size: 0.9rem;">
-                    Start with <strong>Free Tier</strong> - 5 machines included!
+                    <div class="input-group">
+                        <label for="registerEmail">Email Address</label>
+                        <input type="email" id="registerEmail" class="input" placeholder="you@example.com" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="registerPassword">Password</label>
+                        <div class="password-field">
+                            <input type="password" id="registerPassword" class="input" placeholder="••••••••" minlength="6" required>
+                            <button type="button" class="password-toggle" data-target="registerPassword" aria-label="Show password"><span data-icon="eye"></span></button>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="registerPasswordConfirm">Confirm Password</label>
+                        <div class="password-field">
+                            <input type="password" id="registerPasswordConfirm" class="input" placeholder="••••••••" minlength="6" required>
+                            <button type="button" class="password-toggle" data-target="registerPasswordConfirm" aria-label="Show password"><span data-icon="eye"></span></button>
+                        </div>
+                    </div>
+
+                    <label class="terms-row">
+                        <input type="checkbox" required>
+                        <span>I agree to the Terms &amp; Conditions and Privacy Policy</span>
+                    </label>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <span id="registerBtnText">Create Account</span>
+                        <div id="registerSpinner" class="spinner hidden" style="width:20px;height:20px;border-width:2px;margin:0 auto;"></div>
+                    </button>
+
+                    <p class="text-center text-secondary mt-3" style="font-size: 0.85rem;">
+                        Start with the <strong>Free plan</strong> — 5 machines included, no credit card needed.
+                    </p>
+                </form>
+
+                <p class="auth-footnote" id="authFootnote">
+                    Don't have an account? <a href="#" data-switch-tab="register">Register here</a>
                 </p>
-            </form>
+
+                <div class="text-center mt-3">
+                    <a href="https://syncnowise.com" target="_blank" rel="noopener noreferrer" class="made-by-credit" style="justify-content:center;">Powered by <span class="brand-logo-chip"><img src="/images/syncnowise-logo.png" alt="SyncNowise" class="brand-logo-img"></span></a>
+                </div>
+            </div>
         </div>
     </div>
 
+    <script src="/js/icons.js"></script>
+    <script>
+        document.querySelectorAll('[data-icon]').forEach((el) => { el.innerHTML = svgIcon(el.dataset.icon); });
+
+        const authHeading = document.getElementById('authHeading');
+        const authSubheading = document.getElementById('authSubheading');
+        const authFootnote = document.getElementById('authFootnote');
+
+        function syncAuthCopy(mode) {
+            if (mode === 'register') {
+                authHeading.textContent = 'Create your account';
+                authSubheading.textContent = 'Start your free plan today';
+                authFootnote.innerHTML = 'Already have an account? <a href="#" data-switch-tab="login">Login here</a>';
+            } else {
+                authHeading.textContent = 'Welcome back!';
+                authSubheading.textContent = 'Login to continue to your account';
+                authFootnote.innerHTML = 'Don\'t have an account? <a href="#" data-switch-tab="register">Register here</a>';
+            }
+            authFootnote.querySelector('a').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelector(`.auth-tab[data-tab="${e.target.dataset.switchTab}"]`).click();
+            });
+        }
+
+        const shellObserver = new MutationObserver(() => syncAuthCopy(document.getElementById('authShell').dataset.mode));
+        shellObserver.observe(document.getElementById('authShell'), { attributes: true, attributeFilter: ['data-mode'] });
+        syncAuthCopy('login');
+    </script>
     <script src="/js/auth.js"></script>
 </body>
 </html>
