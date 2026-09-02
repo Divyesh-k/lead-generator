@@ -108,6 +108,28 @@
     font-weight: 600;
 }
 
+.sidebar-badge {
+    margin-left: auto;
+    min-width: 1.2rem;
+    height: 1.2rem;
+    padding: 0 0.35rem;
+    border-radius: var(--radius-full);
+    background: var(--error);
+    color: white;
+    font-size: 0.68rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    animation: badge-pop 0.25s ease;
+}
+
+@keyframes badge-pop {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
 .sidebar-footer {
     padding: 1rem;
     border-top: 1px solid var(--sidebar-border);

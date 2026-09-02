@@ -92,12 +92,23 @@
                         <form id="autoScrapeForm">
                             <div class="form-grid">
                                 <div class="input-group">
-                                    <label for="autoScrapeInterval">Interval (minutes)</label>
-                                    <input type="number" id="autoScrapeInterval" class="input" value="15" min="5" max="120" required>
+                                    <label for="autoScrapeInterval">Interval</label>
+                                    <div class="flex gap-2">
+                                        <input type="number" id="autoScrapeInterval" class="input" value="15" min="1" required style="flex:1;">
+                                        <div class="pill-tabs" id="intervalUnitTabs">
+                                            <button type="button" class="pill-tab active" data-unit="minutes">Minutes</button>
+                                            <button type="button" class="pill-tab" data-unit="seconds">Seconds</button>
+                                        </div>
+                                    </div>
+                                    <p class="text-muted mt-1" style="font-size:0.78rem;" id="intervalHint"></p>
                                 </div>
                                 <div class="input-group">
                                     <label for="autoScrapeUnlockLimit">Unlock limit per run</label>
-                                    <input type="number" id="autoScrapeUnlockLimit" class="input" value="2" min="0" max="10" required>
+                                    <input type="number" id="autoScrapeUnlockLimit" class="input" value="2" min="0" max="20" required>
+                                    <label class="flex items-center gap-2 mt-2" style="font-size:0.85rem;color:var(--text-secondary);">
+                                        <input type="checkbox" id="unlockLimitUnlimited" style="accent-color:var(--primary);">
+                                        Unlimited (unlocks everything found each run, up to IndiaMART's own 20/run scrape size)
+                                    </label>
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-primary" id="startAutoScrapeBtn">Start Auto-Scrape</button>

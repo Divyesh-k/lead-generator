@@ -90,7 +90,9 @@ function renderImStatus() {
     if (running) {
         autoScrapeRunning.classList.remove('hidden');
         autoScrapeForm.classList.add('hidden');
-        autoScrapeRunningDesc.textContent = `Every ${imStatus.autoScrapeIntervalMinutes}m, up to ${imStatus.autoScrapeUnlockLimit} unlock(s)/run${imStatus.autoScrapeLastRunAt ? ` · last run ${new Date(imStatus.autoScrapeLastRunAt).toLocaleString()}` : ''}`;
+        const intervalLabel = formatIntervalSeconds(imStatus.autoScrapeIntervalSeconds);
+        const limitLabel = imStatus.autoScrapeUnlockLimit == null ? 'unlimited (capped at 20/run)' : `${imStatus.autoScrapeUnlockLimit} unlock(s)/run`;
+        autoScrapeRunningDesc.textContent = `Every ${intervalLabel}, up to ${limitLabel}${imStatus.autoScrapeLastRunAt ? ` · last run ${new Date(imStatus.autoScrapeLastRunAt).toLocaleString()}` : ''}`;
     } else {
         autoScrapeRunning.classList.add('hidden');
         autoScrapeForm.classList.remove('hidden');
@@ -101,6 +103,13 @@ function escapeHtml(str) {
     const div = document.createElement('div');
     div.textContent = str == null ? '' : String(str);
     return div.innerHTML;
+}
+
+function formatIntervalSeconds(seconds) {
+    if (seconds == null) return '—';
+    if (seconds < 60) return `${seconds}s`;
+    if (seconds % 60 === 0) return `${seconds / 60}m`;
+    return `${Math.round(seconds / 60)}m`;
 }
 
 // ---- Event delegation for buttons rendered inside imStatusCard ----
@@ -181,16 +190,59 @@ document.getElementById('imCopyLinkBtn').addEventListener('click', () => {
 });
 
 // ---- Auto-scrape schedule controls ----
+let intervalUnit = 'minutes';
+const intervalInput = document.getElementById('autoScrapeInterval');
+const intervalHint = document.getElementById('intervalHint');
+const unlockLimitInput = document.getElementById('autoScrapeUnlockLimit');
+const unlimitedCheckbox = document.getElementById('unlockLimitUnlimited');
+
+function updateIntervalHint() {
+    intervalHint.textContent = intervalUnit === 'seconds'
+        ? 'Minimum 5 seconds — kept as a floor so this can\'t hammer IndiaMART nonstop.'
+        : 'Switch to Seconds for sub-minute intervals.';
+}
+updateIntervalHint();
+
+document.getElementById('intervalUnitTabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('.pill-tab');
+    if (!btn) return;
+    intervalUnit = btn.dataset.unit;
+    document.querySelectorAll('#intervalUnitTabs .pill-tab').forEach((t) => t.classList.toggle('active', t === btn));
+    intervalInput.value = intervalUnit === 'seconds' ? 15 : 15;
+    updateIntervalHint();
+});
+
+unlimitedCheckbox.addEventListener('change', () => {
+    unlockLimitInput.disabled = unlimitedCheckbox.checked;
+});
+
 autoScrapeForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const intervalMinutes = parseInt(document.getElementById('autoScrapeInterval').value, 10);
-    const unlockLimit = parseInt(document.getElementById('autoScrapeUnlockLimit').value, 10);
+    const rawInterval = parseInt(intervalInput.value, 10);
+    const intervalSeconds = intervalUnit === 'seconds' ? rawInterval : rawInterval * 60;
+    const unlimited = unlimitedCheckbox.checked;
+    const unlockLimit = parseInt(unlockLimitInput.value, 10);
+
+    const warnings = [];
+    if (intervalSeconds < 60) {
+        warnings.push(`running every ${intervalSeconds} second(s) hits IndiaMART very frequently and could get your account rate-limited or flagged`);
+    }
+    if (unlimited) {
+        warnings.push('unlimited unlocking spends IndiaMART credits on every match found each run, up to 20 per run, with no smaller cap');
+    }
+    if (warnings.length) {
+        const proceed = confirm(`Heads up: ${warnings.join('; and ')}. Continue anyway?`);
+        if (!proceed) return;
+    }
 
     try {
         await apiCall('/indiamart/auto-scrape/start', {
             method: 'POST',
-            body: JSON.stringify({ intervalMinutes, unlockLimit }),
+            body: JSON.stringify({
+                intervalSeconds,
+                ...(unlimited ? { unlimited: true } : { unlockLimit }),
+            }),
         });
         showToast('Auto-scrape started!', 'success');
         await loadImStatus();

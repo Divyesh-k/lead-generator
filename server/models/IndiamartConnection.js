@@ -65,11 +65,12 @@ const indiamartConnectionSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    autoScrapeIntervalMinutes: {
+    autoScrapeIntervalSeconds: {
         type: Number,
-        default: 15,
+        default: 900,
     },
     autoScrapeUnlockLimit: {
+        // null = unlimited for this run (still hard-capped at 20 by the scraper itself)
         type: Number,
         default: 2,
     },

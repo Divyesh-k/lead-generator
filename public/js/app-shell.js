@@ -44,6 +44,7 @@
         const nav = NAV_ITEMS.map((item) => `
             <a href="${item.href}" class="sidebar-link${item.page === activePage ? ' active' : ''}">
                 ${svgIcon(item.icon)}<span>${item.label}</span>
+                ${item.page === 'leads' ? '<span class="sidebar-badge hidden" id="leadsNavBadge"></span>' : ''}
             </a>
         `).join('');
 
@@ -184,6 +185,71 @@
         }
 
         document.dispatchEvent(new CustomEvent('appshell:ready', { detail: { user, subscription } }));
+
+        checkForNewLeads();
+        setInterval(checkForNewLeads, NEW_LEADS_POLL_MS);
+    }
+
+    // ---- New-lead notifications: a badge/count on the "IndiaMART Leads" nav
+    // link plus a toast when leads.scrapedAt values appear that we haven't
+    // seen before. Purely client-side (localStorage) — there's no "read"
+    // flag on the backend, so this only tracks what THIS browser has seen.
+    const NEW_LEADS_POLL_MS = 20000;
+    const SEEN_KEY = 'nexlead_leads_seen_at';
+    const NOTIFIED_KEY = 'nexlead_leads_notified_at';
+
+    async function checkForNewLeads() {
+        let leads;
+        try {
+            const res = await apiCall('/indiamart/leads');
+            leads = res.data || [];
+        } catch (error) {
+            return; // stay quiet — this is a background nicety, not core functionality
+        }
+
+        if (!leads.length) return;
+
+        let seenAt = Number(localStorage.getItem(SEEN_KEY));
+        let notifiedAt = Number(localStorage.getItem(NOTIFIED_KEY));
+
+        // First time this browser has ever checked: baseline to "now" so the
+        // existing backlog of leads doesn't all show up as "new" at once.
+        if (!seenAt) {
+            const now = Date.now();
+            localStorage.setItem(SEEN_KEY, String(now));
+            localStorage.setItem(NOTIFIED_KEY, String(now));
+            return;
+        }
+
+        const newestScrapedAt = Math.max(...leads.map((l) => (l.scrapedAt ? new Date(l.scrapedAt).getTime() : 0)));
+
+        // On the Leads page itself, treat everything currently visible as read.
+        if (document.body.dataset.page === 'leads') {
+            seenAt = Date.now();
+            localStorage.setItem(SEEN_KEY, String(seenAt));
+        }
+
+        const unseenCount = leads.filter((l) => l.scrapedAt && new Date(l.scrapedAt).getTime() > seenAt).length;
+        renderLeadsBadge(unseenCount);
+
+        const unnotified = notifiedAt ? leads.filter((l) => l.scrapedAt && new Date(l.scrapedAt).getTime() > notifiedAt) : [];
+        if (unnotified.length > 0) {
+            showToast(`${unnotified.length} new IndiaMART lead${unnotified.length === 1 ? '' : 's'} came in`, 'success');
+        }
+        if (newestScrapedAt > notifiedAt) {
+            localStorage.setItem(NOTIFIED_KEY, String(newestScrapedAt));
+        }
+    }
+
+    function renderLeadsBadge(count) {
+        const badge = document.getElementById('leadsNavBadge');
+        if (!badge) return;
+        if (count > 0) {
+            badge.textContent = count > 9 ? '9+' : String(count);
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+        }
     }
 
     // This script is always a plain synchronous <script> placed after the page's

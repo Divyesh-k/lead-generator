@@ -26,7 +26,7 @@ function toPublicConnection(conn) {
         lastScrapedAt: conn.lastScrapedAt,
         lastError: conn.lastError,
         autoScrapeEnabled: conn.autoScrapeEnabled,
-        autoScrapeIntervalMinutes: conn.autoScrapeIntervalMinutes,
+        autoScrapeIntervalSeconds: conn.autoScrapeIntervalSeconds,
         autoScrapeUnlockLimit: conn.autoScrapeUnlockLimit,
         autoScrapeLastRunAt: conn.autoScrapeLastRunAt,
     };
@@ -240,19 +240,30 @@ router.post('/auto-scrape/start', protect, async (req, res) => {
             return res.status(400).json({ success: false, message: 'IndiaMART is not connected. Connect your account first.' });
         }
 
-        const parsedInterval = parseInt(req.body.intervalMinutes, 10);
-        const parsedUnlockLimit = parseInt(req.body.unlockLimit, 10);
-        const intervalMinutes = Math.min(Math.max(Number.isFinite(parsedInterval) ? parsedInterval : 15, 5), 120);
-        const unlockLimit = Math.min(Math.max(Number.isFinite(parsedUnlockLimit) ? parsedUnlockLimit : 2, 0), 10);
+        // Interval is in seconds now (was minutes-only). Floor of 5s is a deliberate
+        // safety rail against hammering a third-party site indefinitely, even though
+        // the frontend lets a user ask for less.
+        const parsedInterval = parseInt(req.body.intervalSeconds, 10);
+        const intervalSeconds = Math.min(Math.max(Number.isFinite(parsedInterval) ? parsedInterval : 900, 5), 7200);
+
+        // unlimited: true means "no per-run cap the user set" — runScrape() still
+        // hard-caps actual unlocks at 20/run regardless, so this can't run away.
+        let unlockLimit;
+        if (req.body.unlimited) {
+            unlockLimit = null;
+        } else {
+            const parsedUnlockLimit = parseInt(req.body.unlockLimit, 10);
+            unlockLimit = Math.min(Math.max(Number.isFinite(parsedUnlockLimit) ? parsedUnlockLimit : 2, 0), 20);
+        }
 
         conn.autoScrapeEnabled = true;
-        conn.autoScrapeIntervalMinutes = intervalMinutes;
+        conn.autoScrapeIntervalSeconds = intervalSeconds;
         conn.autoScrapeUnlockLimit = unlockLimit;
         await conn.save();
 
-        autoScrapeScheduler.start(req.user._id.toString(), intervalMinutes, unlockLimit);
+        autoScrapeScheduler.start(req.user._id.toString(), intervalSeconds, unlockLimit);
 
-        res.json({ success: true, message: 'Auto-scrape started', data: { autoScrapeEnabled: true, intervalMinutes, unlockLimit } });
+        res.json({ success: true, message: 'Auto-scrape started', data: { autoScrapeEnabled: true, intervalSeconds, unlockLimit } });
     } catch (error) {
         console.error('Start auto-scrape error:', error);
         res.status(500).json({ success: false, message: 'Server error' });

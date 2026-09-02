@@ -74,8 +74,9 @@ function renderMetrics() {
     if (connected && indiamartStatus.autoScrapeEnabled) {
         pillEl.textContent = 'Running';
         pillEl.className = 'status-pill status-active';
-        subEl.textContent = indiamartStatus.autoScrapeIntervalMinutes
-            ? `Every ${indiamartStatus.autoScrapeIntervalMinutes}m`
+        const seconds = indiamartStatus.autoScrapeIntervalSeconds;
+        subEl.textContent = seconds
+            ? `Every ${seconds < 60 ? `${seconds}s` : `${Math.round(seconds / 60)}m`}`
             : '';
         linkEl.innerHTML = `Stop / manage ${linkArrow}`;
     } else if (connected) {
