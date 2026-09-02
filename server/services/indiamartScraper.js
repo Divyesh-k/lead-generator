@@ -28,10 +28,22 @@ async function runScrape(userId, { fetchCount = 20, unlockLimit = 5 } = {}) {
         if (err instanceof IndiamartApiError && err.code === 'TOKEN_EXPIRED') {
             conn.status = 'expired';
             conn.lastError = 'IndiaMART session expired';
+            conn.lastErrorCode = 'TOKEN_EXPIRED';
+            await conn.save();
+            throw err;
+        }
+        if (err instanceof IndiamartApiError && err.code === 'RATE_LIMITED') {
+            // Re-thrown (not swallowed) so the caller can react — e.g. the auto-scrape
+            // scheduler pauses itself instead of continuing to hit a rate limit.
+            conn.lastError = err.message;
+            conn.lastErrorCode = 'RATE_LIMITED';
             await conn.save();
             throw err;
         }
         if (err instanceof IndiamartApiError) {
+            conn.lastError = err.message;
+            conn.lastErrorCode = err.code || 'FETCH_FAILED';
+            await conn.save();
             return { totalFetched: 0, matched: 0, unlocked: 0, creditsSpent: 0, creditBalance: conn.creditBalance, blPurchaseCountBalance: conn.blPurchaseCountBalance, leads: [], message: err.message };
         }
         throw err;
@@ -109,6 +121,15 @@ async function runScrape(userId, { fetchCount = 20, unlockLimit = 5 } = {}) {
                 if (err instanceof IndiamartApiError && err.code === 'TOKEN_EXPIRED') {
                     conn.status = 'expired';
                     conn.lastError = 'IndiaMART session expired mid-scrape';
+                    conn.lastErrorCode = 'TOKEN_EXPIRED';
+                    await conn.save();
+                    throw err;
+                }
+                if (err instanceof IndiamartApiError && err.code === 'RATE_LIMITED') {
+                    // Stop unlocking further leads this run instead of continuing to
+                    // hammer an endpoint that just told us to back off.
+                    conn.lastError = err.message;
+                    conn.lastErrorCode = 'RATE_LIMITED';
                     await conn.save();
                     throw err;
                 }
@@ -124,6 +145,7 @@ async function runScrape(userId, { fetchCount = 20, unlockLimit = 5 } = {}) {
 
     conn.lastScrapedAt = new Date();
     conn.lastError = null;
+    conn.lastErrorCode = null;
     await conn.save();
 
     return {

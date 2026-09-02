@@ -39,6 +39,12 @@ async function tick(userId) {
             stop(userId);
             return;
         }
+        if (error instanceof IndiamartApiError && error.code === 'RATE_LIMITED') {
+            console.warn(`Auto-scrape paused for user ${userId}: IndiaMART rate-limited the request`);
+            await IndiamartConnection.updateOne({ user: userId }, { $set: { autoScrapeEnabled: false } });
+            stop(userId);
+            return;
+        }
         console.error(`Auto-scrape tick failed for user ${userId}:`, error.message);
     } finally {
         running.delete(userId);

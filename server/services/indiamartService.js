@@ -109,6 +109,9 @@ async function fetchLeads(cookie, glusrid, { start = 1, end = 20 } = {}) {
         }
     );
 
+    if (res.status === 429) {
+        throw new IndiamartApiError('IndiaMART rate-limited this request (HTTP 429). Auto-scrape has been paused to avoid making it worse.', 'RATE_LIMITED');
+    }
     if (res.data && res.data.CODE === '402') {
         throw new IndiamartApiError(res.data.MESSAGE || 'Token expired', 'TOKEN_EXPIRED');
     }
@@ -148,6 +151,9 @@ async function unlockLead(cookie, { glusrId, ofrid, ofrtitle, mappedMcatId, matc
         }
     );
 
+    if (res.status === 429) {
+        throw new IndiamartApiError('IndiaMART rate-limited this request (HTTP 429). Auto-scrape has been paused to avoid making it worse.', 'RATE_LIMITED');
+    }
     if (res.data && res.data.CODE === '402') {
         throw new IndiamartApiError(res.data.MESSAGE || 'Token expired', 'TOKEN_EXPIRED');
     }

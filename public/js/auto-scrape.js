@@ -12,6 +12,42 @@ const autoScrapeRunning = document.getElementById('autoScrapeRunning');
 const autoScrapeRunningDesc = document.getElementById('autoScrapeRunningDesc');
 const autoScrapeForm = document.getElementById('autoScrapeForm');
 
+// Actionable guidance per lastErrorCode from GET /indiamart/status. Unknown/
+// null codes just show the raw message with no specific fix action.
+const ERROR_GUIDANCE = {
+    FETCH_FAILED: {
+        title: 'Session looks stale',
+        hint: 'This usually means your IndiaMART session cookie has gone stale or was revoked. Reconnect to get a fresh session.',
+        action: 'reconnect',
+    },
+    RATE_LIMITED: {
+        title: 'Rate-limited by IndiaMART',
+        hint: 'IndiaMART rejected requests as too frequent. Auto-scrape has been paused automatically — wait a while and use a longer interval before starting again.',
+        action: null,
+    },
+    TOKEN_EXPIRED: {
+        title: 'Session expired',
+        hint: 'Your IndiaMART session expired. Reconnect to keep scraping.',
+        action: 'reconnect',
+    },
+};
+
+function renderErrorBanner() {
+    if (!imStatus.lastError) return '';
+    const guidance = ERROR_GUIDANCE[imStatus.lastErrorCode] || null;
+    return `
+        <div class="error-message show" style="display:block;">
+            <div class="flex items-center gap-2 mb-1">
+                ${svgIcon('alert-triangle')}
+                <strong>${guidance ? guidance.title : 'Last scrape issue'}</strong>
+                ${imStatus.lastErrorCode ? `<span class="badge badge-free" style="font-family:var(--font-mono);font-size:0.7rem;">${escapeHtml(imStatus.lastErrorCode)}</span>` : ''}
+            </div>
+            <p style="margin:0 0 ${guidance && guidance.action ? '0.6rem' : '0'} 0;">${escapeHtml(imStatus.lastError)}${guidance ? ` — ${escapeHtml(guidance.hint)}` : ''}</p>
+            ${guidance && guidance.action === 'reconnect' ? `<button id="imConnectBtn" class="btn btn-primary btn-sm" type="button">${svgIcon('link')}Reconnect IndiaMART</button>` : ''}
+        </div>
+    `;
+}
+
 async function loadImStatus() {
     try {
         const res = await apiCall('/indiamart/status');
@@ -58,6 +94,7 @@ function renderImStatus() {
                 <button id="imDisconnectBtn" class="btn btn-secondary btn-sm" type="button">Disconnect</button>
             </div>
         </div>
+        ${renderErrorBanner()}
         <div class="metric-grid" style="margin-bottom:0;">
             <div class="metric-card">
                 <div class="metric-icon">${svgIcon('credit-card')}</div>

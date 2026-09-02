@@ -188,6 +188,43 @@
 
         checkForNewLeads();
         setInterval(checkForNewLeads, NEW_LEADS_POLL_MS);
+
+        checkIndiamartHealth();
+        setInterval(checkIndiamartHealth, NEW_LEADS_POLL_MS);
+    }
+
+    // ---- IndiaMART health notifications: a global toast (from any page) when
+    // the connection hits a new error — rate-limited, session expired, or any
+    // other scrape failure — so this isn't only visible if you happen to be on
+    // the Auto-Scrape page. Tracked in localStorage so the same error doesn't
+    // re-toast on every poll.
+    const LAST_ERROR_NOTIFIED_KEY = 'nexlead_im_last_error_notified';
+
+    async function checkIndiamartHealth() {
+        let status;
+        try {
+            const res = await apiCall('/indiamart/status');
+            status = res.data;
+        } catch (error) {
+            return;
+        }
+
+        if (!status || !status.connected) return;
+
+        const lastNotifiedError = localStorage.getItem(LAST_ERROR_NOTIFIED_KEY) || '';
+
+        if (status.lastError && status.lastError !== lastNotifiedError) {
+            const prefix = status.lastErrorCode === 'RATE_LIMITED' ? 'IndiaMART rate-limited your account'
+                : status.lastErrorCode === 'TOKEN_EXPIRED' ? 'IndiaMART session expired'
+                : status.lastErrorCode === 'FETCH_FAILED' ? 'IndiaMART session looks stale'
+                : 'IndiaMART scrape issue';
+            showToast(`${prefix}: ${status.lastError}`, 'error');
+            localStorage.setItem(LAST_ERROR_NOTIFIED_KEY, status.lastError);
+        } else if (!status.lastError && lastNotifiedError) {
+            // A clean run since the last error — clear the memory so the same
+            // message would notify again if it recurs later.
+            localStorage.removeItem(LAST_ERROR_NOTIFIED_KEY);
+        }
     }
 
     // ---- New-lead notifications: a badge/count on the "IndiaMART Leads" nav

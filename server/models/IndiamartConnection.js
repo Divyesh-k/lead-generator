@@ -61,6 +61,10 @@ const indiamartConnectionSchema = new mongoose.Schema({
         type: String,
         default: null,
     },
+    lastErrorCode: {
+        type: String,
+        default: null,
+    },
     autoScrapeEnabled: {
         type: Boolean,
         default: false,

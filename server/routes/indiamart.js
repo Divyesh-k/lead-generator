@@ -25,6 +25,7 @@ function toPublicConnection(conn) {
         connectedAt: conn.connectedAt,
         lastScrapedAt: conn.lastScrapedAt,
         lastError: conn.lastError,
+        lastErrorCode: conn.lastErrorCode,
         autoScrapeEnabled: conn.autoScrapeEnabled,
         autoScrapeIntervalSeconds: conn.autoScrapeIntervalSeconds,
         autoScrapeUnlockLimit: conn.autoScrapeUnlockLimit,
@@ -223,6 +224,9 @@ router.post('/scrape', protect, async (req, res) => {
         }
         if (error instanceof IndiamartApiError && error.code === 'TOKEN_EXPIRED') {
             return res.status(400).json({ success: false, message: 'Your IndiaMART session has expired. Reconnect from the dashboard.', code: 'TOKEN_EXPIRED' });
+        }
+        if (error instanceof IndiamartApiError && error.code === 'RATE_LIMITED') {
+            return res.status(429).json({ success: false, message: error.message, code: 'RATE_LIMITED' });
         }
         console.error('Scrape IndiaMART error:', error);
         res.status(500).json({ success: false, message: 'Server error while scraping leads' });
