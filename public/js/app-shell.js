@@ -23,6 +23,9 @@
         window.location.href = '/auth.html';
     }
 
+    const SEEN_KEY = 'nexlead_leads_seen_at';
+    const NOTIFIED_KEY = 'nexlead_leads_notified_at';
+
     const NAV_ITEMS = [
         { page: 'dashboard', href: '/dashboard.html', label: 'Dashboard', icon: 'grid' },
         { page: 'machines', href: '/machines.html', label: 'Machines', icon: 'cpu' },
@@ -105,6 +108,17 @@
         const activePage = body.dataset.page || '';
         const title = body.dataset.title || 'Dashboard';
         const desc = body.dataset.desc || '';
+
+        // Mark everything as seen immediately on page load — synchronous, not
+        // dependent on /auth/me, /subscription/status, or /indiamart/leads
+        // resolving first. Doing this inside the async checkForNewLeads() poll
+        // instead left a real window where visiting the Leads page didn't
+        // reliably clear the nav badge on other pages afterward.
+        if (activePage === 'leads') {
+            const now = String(Date.now());
+            localStorage.setItem(SEEN_KEY, now);
+            localStorage.setItem(NOTIFIED_KEY, now);
+        }
 
         const sidebarWrap = document.createElement('div');
         sidebarWrap.innerHTML = buildSidebar(activePage);
@@ -234,8 +248,6 @@
     // seen before. Purely client-side (localStorage) — there's no "read"
     // flag on the backend, so this only tracks what THIS browser has seen.
     const NEW_LEADS_POLL_MS = 20000;
-    const SEEN_KEY = 'nexlead_leads_seen_at';
-    const NOTIFIED_KEY = 'nexlead_leads_notified_at';
 
     async function checkForNewLeads() {
         let leads;
@@ -245,6 +257,13 @@
         } catch (error) {
             return; // stay quiet — this is a background nicety, not core functionality
         }
+
+        // Only count leads this app's own auto-scrape/manual scrape actually
+        // unlocked — not ones pulled in via the Lead Manager contact sync
+        // (offerId prefixed "cl_"), which reflects activity that happened
+        // elsewhere (the IndiaMART website, another session), not something
+        // the automation itself just did.
+        leads = leads.filter((l) => l.offerId && !l.offerId.startsWith('cl_'));
 
         if (!leads.length) return;
 
@@ -262,10 +281,11 @@
 
         const newestScrapedAt = Math.max(...leads.map((l) => (l.scrapedAt ? new Date(l.scrapedAt).getTime() : 0)));
 
-        // On the Leads page itself, treat everything currently visible as read.
+        // mountShell() already marks the Leads page itself as fully seen the
+        // moment it loads (synchronously, before this async check even starts),
+        // so re-read here in case that happened after seenAt was captured above.
         if (document.body.dataset.page === 'leads') {
-            seenAt = Date.now();
-            localStorage.setItem(SEEN_KEY, String(seenAt));
+            seenAt = Number(localStorage.getItem(SEEN_KEY)) || seenAt;
         }
 
         const unseenCount = leads.filter((l) => l.scrapedAt && new Date(l.scrapedAt).getTime() > seenAt).length;

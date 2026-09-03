@@ -29,6 +29,20 @@
         return div.innerHTML;
     }
 
+    // offerId prefixed "cl_" means this row came from the Lead Manager contact
+    // sync (someone/something else already consumed the BuyLead — the website
+    // directly, another session); anything else was unlocked by this app's own
+    // auto-scrape or manual "Scrape Now".
+    function isAppUnlocked(lead) {
+        return !!(lead.offerId && !lead.offerId.startsWith('cl_'));
+    }
+
+    function sourceIconHtml(lead) {
+        return isAppUnlocked(lead)
+            ? `<span data-tooltip="Unlocked by NexLead" style="color:var(--primary);display:inline-flex;">${svgIcon('zap')}</span>`
+            : `<span data-tooltip="Synced from IndiaMART (unlocked elsewhere)" style="color:var(--text-muted);display:inline-flex;">${svgIcon('refresh-cw')}</span>`;
+    }
+
     function csvEscape(value) {
         const str = value == null ? '' : String(value);
         return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
@@ -107,6 +121,7 @@
             const mobile = lead.buyerMobile ? `+${lead.buyerMobileCountry || '91'} ${lead.buyerMobile}` : '-';
             return `
             <tr class="lead-row" data-index="${i}" style="cursor:pointer;">
+                <td>${sourceIconHtml(lead)}</td>
                 <td>${escapeHtml(lead.title || '-')}</td>
                 <td>${lead.unlocked ? escapeHtml(lead.buyerName || '-') : `<span class="lead-locked">${svgIcon('lock')}Locked</span>`}</td>
                 <td>${lead.unlocked ? escapeHtml(lead.buyerEmail || '-') : '-'}</td>
@@ -114,7 +129,7 @@
                 <td>${escapeHtml(cityState || '-')}</td>
                 <td>${lead.unlocked ? escapeHtml(lead.buyerCompany || 'Not provided') : '-'}</td>
                 <td>${lead.unlocked ? escapeHtml(lead.memberSince || '-') : '-'}</td>
-                <td>${lead.unlocked ? lead.creditsSpent : '-'}</td>
+                <td>${lead.unlocked ? (lead.creditsSpent ?? '-') : '-'}</td>
                 <td>${lead.scrapedAt ? new Date(lead.scrapedAt).toLocaleString() : '-'}</td>
             </tr>`;
         }).join('');
@@ -150,6 +165,7 @@
             ${lead.category ? detailRow('Category', escapeHtml(lead.category)) : ''}
             ${lead.approxOrderValue ? detailRow('Approx. order value', escapeHtml(lead.approxOrderValue)) : ''}
             ${detailRow('Status', lead.unlocked ? `<span class="status-pill status-active">Unlocked</span>` : `<span class="status-pill status-stopped">Locked</span>`)}
+            ${detailRow('Source', isAppUnlocked(lead) ? `${svgIcon('zap')} Unlocked by NexLead` : `${svgIcon('refresh-cw')} Synced from IndiaMART`)}
             ${lead.unlocked ? detailRow('Buyer name', escapeHtml(lead.buyerName || '-')) : ''}
             ${lead.unlocked ? detailRow('Company', escapeHtml(lead.buyerCompany || 'Not provided')) : ''}
             ${lead.unlocked ? detailRow('Email', escapeHtml(lead.buyerEmail || '-')) : ''}

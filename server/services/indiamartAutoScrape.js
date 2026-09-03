@@ -1,5 +1,5 @@
 const IndiamartConnection = require('../models/IndiamartConnection');
-const { runScrape } = require('./indiamartScraper');
+const { runScrape, runContactSync } = require('./indiamartScraper');
 const { IndiamartApiError } = require('./indiamartService');
 
 // In-memory per-user interval handles. Single-process only (matches how the
@@ -30,6 +30,13 @@ async function tick(userId) {
             // actual unlocks at 100 per run.
             unlockLimit: conn.autoScrapeUnlockLimit == null ? Infinity : conn.autoScrapeUnlockLimit,
         });
+
+        // Also sync Lead Manager's contact list every tick, so a BuyLead consumed
+        // by anyone/anything other than this app's own unlock call (the IndiaMART
+        // website directly, another session on the account) still shows up here.
+        // Same session, same cadence — a TOKEN_EXPIRED/RATE_LIMITED here is handled
+        // by the same catch block below since it's the same underlying cookie.
+        await runContactSync(userId, { fetchCount: 25 });
 
         await IndiamartConnection.updateOne({ user: userId }, { $set: { autoScrapeLastRunAt: new Date() } });
     } catch (error) {

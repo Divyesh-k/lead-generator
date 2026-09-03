@@ -1,7 +1,15 @@
 const IndiamartConnection = require('../models/IndiamartConnection');
 const IndiamartLead = require('../models/IndiamartLead');
 const Machine = require('../models/Machine');
-const { fetchLeads, unlockLead, IndiamartApiError } = require('./indiamartService');
+const { fetchLeads, unlockLead, fetchContactList, IndiamartApiError } = require('./indiamartService');
+
+// Exact match only (case-insensitive) — a lead is only considered relevant if
+// its title equals one of the user's machine names precisely, so nothing
+// outside the configured list is ever picked up.
+function findMatchingMachine(titleLower, machineNamesSet) {
+    if (!titleLower || machineNamesSet.size === 0) return null;
+    return machineNamesSet.has(titleLower) ? titleLower : null;
+}
 
 // Shared by the manual "Scrape Leads" button and the auto-scrape interval so both
 // paths fetch/unlock/persist leads identically.
@@ -18,11 +26,11 @@ async function runScrape(userId, { fetchCount = 20, unlockLimit = 5 } = {}) {
     fetchCount = Math.min(Math.max(fetchCount, 1), 100);
     unlockLimit = Math.min(Math.max(unlockLimit, 0), 100);
 
-    // Only leads whose product title exactly matches (case-insensitive) one of the
-    // user's active machines are considered. No active machines configured means
-    // no filter is applied, so a first-time user still sees unfiltered leads.
+    // Only leads whose product title exactly matches (case-insensitive) one of
+    // the user's active machines are considered. No active machines configured
+    // means no filter is applied, so a first-time user still sees unfiltered leads.
     const machines = await Machine.find({ user: userId, isActive: true });
-    const machineNames = new Set(machines.map((m) => m.name.trim().toLowerCase()));
+    const machineNamesSet = new Set(machines.map((m) => m.name.trim().toLowerCase()).filter(Boolean));
 
     let listing;
     try {
@@ -64,7 +72,7 @@ async function runScrape(userId, { fetchCount = 20, unlockLimit = 5 } = {}) {
         const offerId = String(lead.ETO_OFR_ID);
 
         const titleLower = (lead.ETO_OFR_TITLE || '').trim().toLowerCase();
-        if (machineNames.size > 0 && !machineNames.has(titleLower)) {
+        if (machineNamesSet.size > 0 && !findMatchingMachine(titleLower, machineNamesSet)) {
             continue; // doesn't match any of the user's configured machines — skip entirely
         }
         matchedCount++;
@@ -177,4 +185,83 @@ async function runScrape(userId, { fetchCount = 20, unlockLimit = 5 } = {}) {
     };
 }
 
-module.exports = { runScrape };
+// Syncs Lead Manager's contact list — catches every consumed BuyLead regardless
+// of who or what unlocked it (this app's own scrape, the IndiaMART website
+// directly, or another session on the same account), since a contact appears
+// here the moment a BuyLead is consumed, with buyer details already visible
+// (no separate unlock/credit-spend step, unlike the BuyLeads marketplace).
+// Namespacing the id with "cl_" keeps these rows from ever colliding with a
+// real BuyLeads offerId (ETO_OFR_ID), which is purely numeric.
+async function runContactSync(userId, { fetchCount = 25 } = {}) {
+    const conn = await IndiamartConnection.findOne({ user: userId }).select('+cookie');
+
+    if (!conn || conn.status !== 'connected' || !conn.cookie) {
+        throw new IndiamartApiError('IndiaMART is not connected', 'NOT_CONNECTED');
+    }
+
+    fetchCount = Math.min(Math.max(fetchCount, 1), 100);
+
+    const machines = await Machine.find({ user: userId, isActive: true });
+    const machineNamesSet = new Set(machines.map((m) => m.name.trim().toLowerCase()).filter(Boolean));
+
+    const contacts = await fetchContactList(conn.cookie, { start: 1, end: fetchCount });
+
+    let matchedCount = 0;
+    let savedCount = 0;
+
+    for (const contact of contacts) {
+        const productLower = (contact.contact_last_product || '').trim().toLowerCase();
+        if (machineNamesSet.size > 0 && !findMatchingMachine(productLower, machineNamesSet)) {
+            continue; // not relevant to any of the user's machines
+        }
+        matchedCount++;
+
+        // Only contacts that came from a consumed BuyLead — organic enquiries and
+        // catalog views are a different thing and aren't "leads" in the sense the
+        // rest of this app uses that word.
+        if (contact.is_buylead !== '1') {
+            continue;
+        }
+
+        const offerId = `cl_${contact.im_contact_id}`;
+        const existingByContactId = await IndiamartLead.findOne({ user: userId, offerId });
+        if (existingByContactId) {
+            continue; // already recorded via this same contact sync
+        }
+
+        // The same BuyLead can already exist under its real offerId if THIS app's
+        // own scraper unlocked it first — offerId and im_contact_id are different
+        // ID spaces with no shared key, so the only reliable way to catch that
+        // overlap is matching on the buyer's mobile number (unique per buyer).
+        if (contact.contacts_mobile1) {
+            const existingByMobile = await IndiamartLead.findOne({ user: userId, buyerMobile: contact.contacts_mobile1 });
+            if (existingByMobile) {
+                continue; // same buyer already recorded under a real offerId — don't duplicate
+            }
+        }
+
+        await IndiamartLead.create({
+            user: userId,
+            offerId,
+            title: contact.contact_last_product || null,
+            unlocked: true, // contact details are already visible in this response
+            creditsSpent: null, // unknown — we didn't perform the unlock ourselves
+            buyerName: contact.contacts_name || null,
+            buyerCompany: contact.contacts_company || null,
+            buyerMobile: contact.contacts_mobile1 || null,
+            buyerMobileCountry: contact.contact_ph_country || null,
+            buyerCity: contact.contact_city || null,
+            buyerState: contact.contact_state || null,
+            buyerCountry: contact.country_name || null,
+            scrapedAt: contact.last_contact_date ? new Date(contact.last_contact_date) : new Date(),
+        });
+        savedCount++;
+    }
+
+    conn.lastContactSyncAt = new Date();
+    await conn.save();
+
+    return { totalFetched: contacts.length, matched: matchedCount, saved: savedCount };
+}
+
+module.exports = { runScrape, runContactSync };

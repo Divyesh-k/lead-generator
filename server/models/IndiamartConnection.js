@@ -82,6 +82,10 @@ const indiamartConnectionSchema = new mongoose.Schema({
         type: Date,
         default: null,
     },
+    lastContactSyncAt: {
+        type: Date,
+        default: null,
+    },
     createdAt: {
         type: Date,
         default: Date.now,

@@ -5,7 +5,7 @@ const { protect } = require('../middleware/auth');
 const IndiamartConnection = require('../models/IndiamartConnection');
 const IndiamartLead = require('../models/IndiamartLead');
 const { parseCookieMeta, fetchLeads, IndiamartApiError } = require('../services/indiamartService');
-const { runScrape } = require('../services/indiamartScraper');
+const { runScrape, runContactSync } = require('../services/indiamartScraper');
 const autoScrapeScheduler = require('../services/indiamartAutoScrape');
 
 const CONNECT_LINK_TTL_MS = 23 * 60 * 60 * 1000; // 23 hours, matches "Link valid 23 hours from now" UX
@@ -216,6 +216,16 @@ router.post('/scrape', protect, async (req, res) => {
             fetchCount: Number.isFinite(parsedFetchCount) ? parsedFetchCount : 20,
             unlockLimit: Number.isFinite(parsedUnlockLimit) ? parsedUnlockLimit : 5,
         });
+
+        // Best-effort: also pull in any contact already consumed outside this app
+        // (the IndiaMART website directly, another session). Failing this shouldn't
+        // hide a successful BuyLeads scrape result, so it's caught separately.
+        try {
+            data.contactSync = await runContactSync(req.user._id, { fetchCount: 25 });
+        } catch (syncError) {
+            console.error('Contact sync (manual scrape) failed:', syncError.message);
+            data.contactSync = { error: syncError.message };
+        }
 
         res.json({ success: true, data });
     } catch (error) {
