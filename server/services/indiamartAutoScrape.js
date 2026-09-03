@@ -25,9 +25,9 @@ async function tick(userId) {
         }
 
         await runScrape(userId, {
-            fetchCount: 20,
+            fetchCount: 100,
             // null = unlimited-per-user-setting; runScrape() itself still hard-caps
-            // actual unlocks at 20 per run.
+            // actual unlocks at 100 per run.
             unlockLimit: conn.autoScrapeUnlockLimit == null ? Infinity : conn.autoScrapeUnlockLimit,
         });
 
@@ -55,7 +55,7 @@ function start(userId, intervalSeconds, unlockLimit) {
     stop(userId); // clear any existing timer first
     const handle = setInterval(() => tick(userId), intervalSeconds * 1000);
     timers.set(userId, handle);
-    const limitLabel = unlockLimit == null ? 'unlimited (capped at 20/run)' : unlockLimit;
+    const limitLabel = unlockLimit == null ? 'unlimited (capped at 100/run)' : unlockLimit;
     console.log(`Auto-scrape started for user ${userId}: every ${intervalSeconds}s, unlocking up to ${limitLabel} new lead(s) per run`);
 }
 

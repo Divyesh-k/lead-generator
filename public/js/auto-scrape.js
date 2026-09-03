@@ -30,6 +30,16 @@ const ERROR_GUIDANCE = {
         hint: 'Your IndiaMART session expired. Reconnect to keep scraping.',
         action: 'reconnect',
     },
+    UNLOCK_DECLINED: {
+        title: 'IndiaMART declined this unlock',
+        hint: 'Your session is fine — IndiaMART itself said no to unlocking this specific lead (it may be expired, already claimed, or otherwise unavailable). Try unlocking it directly from seller.indiamart.com to see their exact reason.',
+        action: null,
+    },
+    UNLOCK_FAILED: {
+        title: 'Unlock request failed',
+        hint: 'The request to unlock a specific lead didn\'t go through. This is usually transient — the next scrape will retry it automatically.',
+        action: null,
+    },
 };
 
 function renderErrorBanner() {
@@ -128,7 +138,7 @@ function renderImStatus() {
         autoScrapeRunning.classList.remove('hidden');
         autoScrapeForm.classList.add('hidden');
         const intervalLabel = formatIntervalSeconds(imStatus.autoScrapeIntervalSeconds);
-        const limitLabel = imStatus.autoScrapeUnlockLimit == null ? 'unlimited (capped at 20/run)' : `${imStatus.autoScrapeUnlockLimit} unlock(s)/run`;
+        const limitLabel = imStatus.autoScrapeUnlockLimit == null ? 'unlimited (capped at 100/run)' : `${imStatus.autoScrapeUnlockLimit} unlock(s)/run`;
         autoScrapeRunningDesc.textContent = `Every ${intervalLabel}, up to ${limitLabel}${imStatus.autoScrapeLastRunAt ? ` · last run ${new Date(imStatus.autoScrapeLastRunAt).toLocaleString()}` : ''}`;
     } else {
         autoScrapeRunning.classList.add('hidden');
@@ -235,7 +245,7 @@ const unlimitedCheckbox = document.getElementById('unlockLimitUnlimited');
 
 function updateIntervalHint() {
     intervalHint.textContent = intervalUnit === 'seconds'
-        ? 'Minimum 5 seconds — kept as a floor so this can\'t hammer IndiaMART nonstop.'
+        ? 'Minimum 2 seconds — kept as a floor so this can\'t hammer IndiaMART nonstop.'
         : 'Switch to Seconds for sub-minute intervals.';
 }
 updateIntervalHint();
@@ -266,7 +276,7 @@ autoScrapeForm.addEventListener('submit', async (e) => {
         warnings.push(`running every ${intervalSeconds} second(s) hits IndiaMART very frequently and could get your account rate-limited or flagged`);
     }
     if (unlimited) {
-        warnings.push('unlimited unlocking spends IndiaMART credits on every match found each run, up to 20 per run, with no smaller cap');
+        warnings.push('unlimited unlocking spends IndiaMART credits on every match found each run, up to 100 per run, with no smaller cap');
     }
     if (warnings.length) {
         const proceed = confirm(`Heads up: ${warnings.join('; and ')}. Continue anyway?`);

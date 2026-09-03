@@ -12,8 +12,11 @@ async function runScrape(userId, { fetchCount = 20, unlockLimit = 5 } = {}) {
         throw new IndiamartApiError('IndiaMART is not connected', 'NOT_CONNECTED');
     }
 
-    fetchCount = Math.min(Math.max(fetchCount, 1), 20);
-    unlockLimit = Math.min(Math.max(unlockLimit, 0), 20);
+    // Ceiling raised from 20 to 100 at the user's explicit request, to test
+    // whether IndiaMART's endpoint actually supports a page/unlock size this
+    // large — unverified against their (undocumented) API before this change.
+    fetchCount = Math.min(Math.max(fetchCount, 1), 100);
+    unlockLimit = Math.min(Math.max(unlockLimit, 0), 100);
 
     // Only leads whose product title exactly matches (case-insensitive) one of the
     // user's active machines are considered. No active machines configured means
@@ -53,6 +56,7 @@ async function runScrape(userId, { fetchCount = 20, unlockLimit = 5 } = {}) {
     let unlockedCount = 0;
     let creditsSpent = 0;
     let matchedCount = 0;
+    let hadSoftIssue = false; // an unlock was attempted but declined/failed without throwing
     const results = [];
 
     for (let i = 0; i < displayList.length; i++) {
@@ -115,7 +119,16 @@ async function runScrape(userId, { fetchCount = 20, unlockLimit = 5 } = {}) {
                     if (balance.creditBalance != null) conn.creditBalance = Number(balance.creditBalance);
                     if (balance.blPurchaseCountBalance != null) conn.blPurchaseCountBalance = Number(balance.blPurchaseCountBalance);
                 } else {
+                    // IndiaMART answered (no exception) but declined to unlock this
+                    // specific lead — capture *why* instead of failing silently, since
+                    // this previously vanished with zero visibility.
                     leadDoc.unlocked = false;
+                    const declineReason = unlockRes && (unlockRes.Msg || unlockRes.msg || unlockRes.Message || unlockRes.BLmsg);
+                    conn.lastError = declineReason
+                        ? `IndiaMART declined to unlock "${lead.ETO_OFR_TITLE}": ${declineReason}`
+                        : `IndiaMART declined to unlock "${lead.ETO_OFR_TITLE}" (no reason given in response)`;
+                    conn.lastErrorCode = 'UNLOCK_DECLINED';
+                    hadSoftIssue = true;
                 }
             } catch (err) {
                 if (err instanceof IndiamartApiError && err.code === 'TOKEN_EXPIRED') {
@@ -135,6 +148,9 @@ async function runScrape(userId, { fetchCount = 20, unlockLimit = 5 } = {}) {
                 }
                 console.error(`Unlock failed for offer ${offerId}:`, err.message);
                 leadDoc.unlocked = false;
+                conn.lastError = `Unlock failed for "${lead.ETO_OFR_TITLE}": ${err.message}`;
+                conn.lastErrorCode = 'UNLOCK_FAILED';
+                hadSoftIssue = true;
             }
         }
 
@@ -144,8 +160,10 @@ async function runScrape(userId, { fetchCount = 20, unlockLimit = 5 } = {}) {
     }
 
     conn.lastScrapedAt = new Date();
-    conn.lastError = null;
-    conn.lastErrorCode = null;
+    if (!hadSoftIssue) {
+        conn.lastError = null;
+        conn.lastErrorCode = null;
+    }
     await conn.save();
 
     return {

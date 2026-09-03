@@ -217,6 +217,8 @@
             const prefix = status.lastErrorCode === 'RATE_LIMITED' ? 'IndiaMART rate-limited your account'
                 : status.lastErrorCode === 'TOKEN_EXPIRED' ? 'IndiaMART session expired'
                 : status.lastErrorCode === 'FETCH_FAILED' ? 'IndiaMART session looks stale'
+                : status.lastErrorCode === 'UNLOCK_DECLINED' ? 'IndiaMART declined an unlock'
+                : status.lastErrorCode === 'UNLOCK_FAILED' ? 'An unlock request failed'
                 : 'IndiaMART scrape issue';
             showToast(`${prefix}: ${status.lastError}`, 'error');
             localStorage.setItem(LAST_ERROR_NOTIFIED_KEY, status.lastError);

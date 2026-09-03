@@ -244,20 +244,20 @@ router.post('/auto-scrape/start', protect, async (req, res) => {
             return res.status(400).json({ success: false, message: 'IndiaMART is not connected. Connect your account first.' });
         }
 
-        // Interval is in seconds now (was minutes-only). Floor of 5s is a deliberate
+        // Interval is in seconds now (was minutes-only). Floor of 2s is a deliberate
         // safety rail against hammering a third-party site indefinitely, even though
         // the frontend lets a user ask for less.
         const parsedInterval = parseInt(req.body.intervalSeconds, 10);
-        const intervalSeconds = Math.min(Math.max(Number.isFinite(parsedInterval) ? parsedInterval : 900, 5), 7200);
+        const intervalSeconds = Math.min(Math.max(Number.isFinite(parsedInterval) ? parsedInterval : 900, 2), 7200);
 
         // unlimited: true means "no per-run cap the user set" — runScrape() still
-        // hard-caps actual unlocks at 20/run regardless, so this can't run away.
+        // hard-caps actual unlocks at 100/run regardless, so this can't run away.
         let unlockLimit;
         if (req.body.unlimited) {
             unlockLimit = null;
         } else {
             const parsedUnlockLimit = parseInt(req.body.unlockLimit, 10);
-            unlockLimit = Math.min(Math.max(Number.isFinite(parsedUnlockLimit) ? parsedUnlockLimit : 2, 0), 20);
+            unlockLimit = Math.min(Math.max(Number.isFinite(parsedUnlockLimit) ? parsedUnlockLimit : 2, 0), 100);
         }
 
         conn.autoScrapeEnabled = true;
