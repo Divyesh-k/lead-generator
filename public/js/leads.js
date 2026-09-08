@@ -9,6 +9,7 @@
     let sortKey = 'scrapedAt';
     let sortDir = 'desc';
     let searchTerm = '';
+    let sourceFilter = 'all'; // 'all' | 'app' (unlocked by this app's own scrape) | 'synced' (unlocked elsewhere, picked up via Lead Manager sync)
 
     const loadingEl = document.getElementById('leadsLoading');
     const tableWrap = document.getElementById('leadsTableWrap');
@@ -17,6 +18,7 @@
     const noResultsState = document.getElementById('leadsNoResultsState');
     const countBadge = document.getElementById('leadsCountBadge');
     const searchInput = document.getElementById('leadSearchInput');
+    const sourceFilterSelect = document.getElementById('leadSourceFilter');
 
     document.getElementById('searchIcon').innerHTML = svgIcon('search');
     document.getElementById('exportIcon').innerHTML = svgIcon('download');
@@ -69,12 +71,14 @@
 
     function applyFilters() {
         const term = searchTerm.trim().toLowerCase();
-        filteredLeads = !term
-            ? indiamartLeads.slice()
-            : indiamartLeads.filter((lead) => {
-                const haystack = [lead.title, lead.buyerCompany, lead.buyerCity].filter(Boolean).join(' ').toLowerCase();
-                return haystack.includes(term);
-            });
+
+        filteredLeads = indiamartLeads.filter((lead) => {
+            if (sourceFilter === 'app' && !isAppUnlocked(lead)) return false;
+            if (sourceFilter === 'synced' && isAppUnlocked(lead)) return false;
+            if (!term) return true;
+            const haystack = [lead.title, lead.buyerCompany, lead.buyerCity].filter(Boolean).join(' ').toLowerCase();
+            return haystack.includes(term);
+        });
 
         filteredLeads.sort((a, b) => {
             let av = a[sortKey];
@@ -95,8 +99,11 @@
     }
 
     function renderIndiamartLeads() {
-        const unlockedCount = indiamartLeads.filter((l) => l.unlocked).length;
-        countBadge.innerHTML = `<strong>${indiamartLeads.length}</strong> total &middot; <strong>${unlockedCount}</strong> unlocked`;
+        const sourceScoped = sourceFilter === 'all'
+            ? indiamartLeads
+            : indiamartLeads.filter((l) => (sourceFilter === 'app' ? isAppUnlocked(l) : !isAppUnlocked(l)));
+        const unlockedCount = sourceScoped.filter((l) => l.unlocked).length;
+        countBadge.innerHTML = `<strong>${sourceScoped.length}</strong> ${sourceFilter === 'all' ? 'total' : 'shown'} &middot; <strong>${unlockedCount}</strong> unlocked`;
 
         if (!indiamartLeads.length) {
             tableWrap.classList.add('hidden');
@@ -130,6 +137,7 @@
                 <td>${lead.unlocked ? escapeHtml(lead.buyerCompany || 'Not provided') : '-'}</td>
                 <td>${lead.unlocked ? escapeHtml(lead.memberSince || '-') : '-'}</td>
                 <td>${lead.unlocked ? (lead.creditsSpent ?? '-') : '-'}</td>
+                <td>${escapeHtml(lead.postedAt || '-')}</td>
                 <td>${lead.scrapedAt ? new Date(lead.scrapedAt).toLocaleString() : '-'}</td>
             </tr>`;
         }).join('');
@@ -173,6 +181,7 @@
             ${lead.unlocked && cityState ? detailRow('Location', escapeHtml(cityState)) : ''}
             ${lead.unlocked && lead.memberSince ? detailRow('IndiaMART member since', escapeHtml(lead.memberSince)) : ''}
             ${lead.unlocked ? detailRow('Credits spent', String(lead.creditsSpent ?? '-')) : ''}
+            ${lead.postedAt ? detailRow('Posted on IndiaMART', escapeHtml(lead.postedAt)) : ''}
             ${detailRow('Scraped at', lead.scrapedAt ? new Date(lead.scrapedAt).toLocaleString() : '-')}
         `;
 
@@ -193,30 +202,50 @@
         applyFilters();
     });
 
+    sourceFilterSelect.addEventListener('change', (e) => {
+        sourceFilter = e.target.value;
+        applyFilters();
+    });
+
+    // Columns holding a date/time value should sort newest-first the moment
+    // they're selected — an "ascending" first click on a time column (oldest
+    // on top) reads as broken, since "recent leads on top" is the whole point
+    // of a time column. Text columns keep the conventional A-Z first click.
+    const DATE_SORT_KEYS = new Set(['scrapedAt']);
+
+    function updateSortHeaderState() {
+        document.querySelectorAll('th.sortable').forEach((el) => {
+            const isActive = el.dataset.sort === sortKey;
+            el.classList.toggle('active', isActive);
+            el.classList.toggle('sort-asc', isActive && sortDir === 'asc');
+        });
+    }
+
     document.querySelectorAll('th.sortable').forEach((th) => {
-        th.innerHTML = `${th.textContent}${svgIcon('chevron-down')}`;
+        th.innerHTML = `${th.textContent}<span class="sort-chevron">${svgIcon('chevron-down')}</span>`;
         th.addEventListener('click', () => {
             const key = th.dataset.sort;
             if (sortKey === key) {
                 sortDir = sortDir === 'asc' ? 'desc' : 'asc';
             } else {
                 sortKey = key;
-                sortDir = 'asc';
+                sortDir = DATE_SORT_KEYS.has(key) ? 'desc' : 'asc';
             }
-            document.querySelectorAll('th.sortable').forEach((el) => el.classList.remove('active'));
-            th.classList.add('active');
+            updateSortHeaderState();
             applyFilters();
         });
     });
 
+    updateSortHeaderState();
+
     document.getElementById('exportLeadsBtn').addEventListener('click', () => {
-        if (!indiamartLeads.length) {
+        if (!filteredLeads.length) {
             showToast('No IndiaMART leads to export yet', 'info');
             return;
         }
 
-        const headers = ['Product', 'Buyer Name', 'Company', 'Email', 'Mobile', 'City', 'State', 'Country', 'Member Since', 'Order Value', 'Category', 'Credits Spent', 'Unlocked', 'Scraped At'];
-        const rows = indiamartLeads.map((lead) => [
+        const headers = ['Product', 'Buyer Name', 'Company', 'Email', 'Mobile', 'City', 'State', 'Country', 'Member Since', 'Order Value', 'Category', 'Credits Spent', 'Unlocked', 'Posted On', 'Scraped At'];
+        const rows = filteredLeads.map((lead) => [
             lead.title,
             lead.buyerName,
             lead.buyerCompany || 'Not provided',
@@ -230,6 +259,7 @@
             lead.category,
             lead.creditsSpent,
             lead.unlocked ? 'Yes' : 'No',
+            lead.postedAt,
             lead.scrapedAt ? new Date(lead.scrapedAt).toLocaleString() : '',
         ]);
 

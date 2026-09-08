@@ -15,7 +15,7 @@ const { fetchLeads, unlockLead, fetchContactList, IndiamartApiError } = require(
 // "Tabletop"). Requiring ALL of the machine's words (not just one) is what
 // keeps this precise rather than a loose/fuzzy match.
 function normalizeWords(str) {
-    return (str || '')
+    return (str || '')  
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, ' ')
         .trim()
@@ -36,10 +36,16 @@ function machineMatchesText(machineWords, tokenSet) {
     return machineWords.length > 0 && machineWords.every((w) => tokenSet.has(w));
 }
 
-// Checked separately against title and category (not blended into one bag of
-// words) so a match can't be assembled from unrelated halves of each.
-function leadMatchesMachine(machineWords, titleTokenSet, categoryTokenSet) {
-    return machineMatchesText(machineWords, titleTokenSet) || (categoryTokenSet && machineMatchesText(machineWords, categoryTokenSet));
+// Matching is against the buyer-typed lead TITLE only — not IndiaMART's
+// category. Category names are IndiaMART's own broad classification (e.g.
+// "Laser Engraving Machines" covers everything from a small desktop unit to
+// a large industrial one), so matching on category alone let a generic
+// catalog entry match leads that weren't actually a match — confirmed live
+// with a real lead titled "1390 CO2 Laser Engraving Machine" under category
+// "Laser Engraving Machines". Explicit user instruction: match against the
+// title, not the category.
+function leadMatchesMachine(machineWords, titleTokenSet) {
+    return machineMatchesText(machineWords, titleTokenSet);
 }
 
 // Shared by the manual "Scrape Leads" button and the auto-scrape interval so both
@@ -104,8 +110,7 @@ async function runScrape(userId, { fetchCount = 20, unlockLimit = 5 } = {}) {
         const offerId = String(lead.ETO_OFR_ID);
 
         const titleTokenSet = buildTokenSet(lead.ETO_OFR_TITLE);
-        const categoryTokenSet = buildTokenSet(lead.ETO_OFR_GLCAT_MCAT_NAME);
-        if (machineWordLists.length > 0 && !machineWordLists.some((mw) => leadMatchesMachine(mw, titleTokenSet, categoryTokenSet))) {
+        if (machineWordLists.length > 0 && !machineWordLists.some((mw) => leadMatchesMachine(mw, titleTokenSet))) {
             continue; // doesn't match any of the user's configured machines — skip entirely
         }
         matchedCount++;
