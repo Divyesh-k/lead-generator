@@ -3,12 +3,43 @@ const IndiamartLead = require('../models/IndiamartLead');
 const Machine = require('../models/Machine');
 const { fetchLeads, unlockLead, fetchContactList, IndiamartApiError } = require('./indiamartService');
 
-// Exact match only (case-insensitive) — a lead is only considered relevant if
-// its title equals one of the user's machine names precisely, so nothing
-// outside the configured list is ever picked up.
-function findMatchingMachine(titleLower, machineNamesSet) {
-    if (!titleLower || machineNamesSet.size === 0) return null;
-    return machineNamesSet.has(titleLower) ? titleLower : null;
+// Word-overlap matching (not plain exact-string, not loose substring). Real
+// buyer-typed lead titles almost never spell things exactly like a catalog
+// machine name — e.g. "Table Top Laser Marking, Engraving And Cutting
+// Machine" vs a machine named "Tabletop Laser Marking Machine" — so exact
+// matching missed the large majority of real, currently-open BuyLeads.
+//
+// A machine matches a piece of text if EVERY word of the machine name is
+// found somewhere in that text — either as a whole word, or as two adjacent
+// words joined together (handles compound-word splits like "Table"+"Top" vs
+// "Tabletop"). Requiring ALL of the machine's words (not just one) is what
+// keeps this precise rather than a loose/fuzzy match.
+function normalizeWords(str) {
+    return (str || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+}
+
+function buildTokenSet(str) {
+    const words = normalizeWords(str);
+    const set = new Set(words);
+    for (let i = 0; i < words.length - 1; i++) {
+        set.add(words[i] + words[i + 1]);
+    }
+    return set;
+}
+
+function machineMatchesText(machineWords, tokenSet) {
+    return machineWords.length > 0 && machineWords.every((w) => tokenSet.has(w));
+}
+
+// Checked separately against title and category (not blended into one bag of
+// words) so a match can't be assembled from unrelated halves of each.
+function leadMatchesMachine(machineWords, titleTokenSet, categoryTokenSet) {
+    return machineMatchesText(machineWords, titleTokenSet) || (categoryTokenSet && machineMatchesText(machineWords, categoryTokenSet));
 }
 
 // Shared by the manual "Scrape Leads" button and the auto-scrape interval so both
@@ -26,11 +57,12 @@ async function runScrape(userId, { fetchCount = 20, unlockLimit = 5 } = {}) {
     fetchCount = Math.min(Math.max(fetchCount, 1), 100);
     unlockLimit = Math.min(Math.max(unlockLimit, 0), 100);
 
-    // Only leads whose product title exactly matches (case-insensitive) one of
-    // the user's active machines are considered. No active machines configured
-    // means no filter is applied, so a first-time user still sees unfiltered leads.
+    // A lead is only considered relevant if its title or category word-matches
+    // one of the user's active machines (see leadMatchesMachine above). No
+    // active machines configured means no filter is applied, so a first-time
+    // user still sees unfiltered leads.
     const machines = await Machine.find({ user: userId, isActive: true });
-    const machineNamesSet = new Set(machines.map((m) => m.name.trim().toLowerCase()).filter(Boolean));
+    const machineWordLists = machines.map((m) => normalizeWords(m.name)).filter((w) => w.length > 0);
 
     let listing;
     try {
@@ -71,8 +103,9 @@ async function runScrape(userId, { fetchCount = 20, unlockLimit = 5 } = {}) {
         const lead = displayList[i];
         const offerId = String(lead.ETO_OFR_ID);
 
-        const titleLower = (lead.ETO_OFR_TITLE || '').trim().toLowerCase();
-        if (machineNamesSet.size > 0 && !findMatchingMachine(titleLower, machineNamesSet)) {
+        const titleTokenSet = buildTokenSet(lead.ETO_OFR_TITLE);
+        const categoryTokenSet = buildTokenSet(lead.ETO_OFR_GLCAT_MCAT_NAME);
+        if (machineWordLists.length > 0 && !machineWordLists.some((mw) => leadMatchesMachine(mw, titleTokenSet, categoryTokenSet))) {
             continue; // doesn't match any of the user's configured machines — skip entirely
         }
         matchedCount++;
@@ -202,7 +235,7 @@ async function runContactSync(userId, { fetchCount = 25 } = {}) {
     fetchCount = Math.min(Math.max(fetchCount, 1), 100);
 
     const machines = await Machine.find({ user: userId, isActive: true });
-    const machineNamesSet = new Set(machines.map((m) => m.name.trim().toLowerCase()).filter(Boolean));
+    const machineWordLists = machines.map((m) => normalizeWords(m.name)).filter((w) => w.length > 0);
 
     const contacts = await fetchContactList(conn.cookie, { start: 1, end: fetchCount });
 
@@ -210,8 +243,8 @@ async function runContactSync(userId, { fetchCount = 25 } = {}) {
     let savedCount = 0;
 
     for (const contact of contacts) {
-        const productLower = (contact.contact_last_product || '').trim().toLowerCase();
-        if (machineNamesSet.size > 0 && !findMatchingMachine(productLower, machineNamesSet)) {
+        const productTokenSet = buildTokenSet(contact.contact_last_product);
+        if (machineWordLists.length > 0 && !machineWordLists.some((mw) => machineMatchesText(mw, productTokenSet))) {
             continue; // not relevant to any of the user's machines
         }
         matchedCount++;

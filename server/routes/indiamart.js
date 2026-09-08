@@ -254,11 +254,11 @@ router.post('/auto-scrape/start', protect, async (req, res) => {
             return res.status(400).json({ success: false, message: 'IndiaMART is not connected. Connect your account first.' });
         }
 
-        // Interval is in seconds now (was minutes-only). Floor of 2s is a deliberate
-        // safety rail against hammering a third-party site indefinitely, even though
-        // the frontend lets a user ask for less.
+        // Interval is in seconds now (was minutes-only). Floor lowered to 1s at the
+        // user's explicit request, to test how aggressively this can poll — still a
+        // deliberate rail (not 0/unbounded) against a runaway interval value.
         const parsedInterval = parseInt(req.body.intervalSeconds, 10);
-        const intervalSeconds = Math.min(Math.max(Number.isFinite(parsedInterval) ? parsedInterval : 900, 2), 7200);
+        const intervalSeconds = Math.min(Math.max(Number.isFinite(parsedInterval) ? parsedInterval : 900, 1), 7200);
 
         // unlimited: true means "no per-run cap the user set" — runScrape() still
         // hard-caps actual unlocks at 100/run regardless, so this can't run away.
